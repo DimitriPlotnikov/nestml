@@ -1,14 +1,9 @@
-language: java
-
-os:
-  - linux
-
-jdk:
-  - oraclejdk8
-
-
 services:
   - docker
   
-before_install:
-  - docker build -t nestml .
+jobs:
+  include:
+    -stage: building nestml container and running unit tests
+    script:
+      - docker build -t nestml .
+      - docker images
