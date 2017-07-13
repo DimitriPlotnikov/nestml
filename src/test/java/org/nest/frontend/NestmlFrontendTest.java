@@ -127,6 +127,8 @@ public class NestmlFrontendTest {
 
   @Test
   public void failMe() {
+    System.out.println("!!!BEFORE");
     Assert.assertEquals(true, false);
+    System.out.println("!!!AFTER");
   }
 }
