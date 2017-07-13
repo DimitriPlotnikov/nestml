@@ -8,16 +8,9 @@ RUN apk --update add python-dev
 RUN apk --update add clang # for clang-format
 RUN apk --update add g++   # is required by sympy
 RUN apk --update add sudo
-
-# Set environment
-#ENV JAVA_HOME /usr/bin/java
-#ENV PATH ${PATH}:${JAVA_HOME}/bin
+RUN apk --update add py-pip
 
 # Install mpmath, required by sympy
-WORKDIR /tmp
-RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN python get-pip.py
-RUN pip install mpmath
 RUN pip install sympy
 
 WORKDIR /tmp
@@ -33,4 +26,3 @@ WORKDIR /data
 RUN git clone https://github.com/nest/nestml.git
 WORKDIR /data/nestml
 RUN mvn install
-
