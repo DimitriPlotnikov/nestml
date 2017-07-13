@@ -5,6 +5,7 @@
  */
 package org.nest.frontend;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -123,5 +124,9 @@ public class NestmlFrontendTest {
 
     new NestmlFrontend().start(args);
   }
-  
+
+  @Test
+  public void failMe() {
+    Assert.assertEquals(true, false);
+  }
 }
