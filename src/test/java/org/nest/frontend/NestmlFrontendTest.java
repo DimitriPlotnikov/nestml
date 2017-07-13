@@ -132,5 +132,6 @@ public class NestmlFrontendTest {
         "--target", outputPath.toString()};
 
     new NestmlFrontend().start(args);
+    assertTrue(false);
   }
 }
