@@ -5,6 +5,7 @@
  */
 package org.nest.frontend;
 
+import de.se_rwth.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -127,8 +128,8 @@ public class NestmlFrontendTest {
 
   @Test
   public void failMe() {
-    System.out.println("!!!BEFORE");
+    Log.warn("!!!BEFORE");
     Assert.assertEquals(true, false);
-    System.out.println("!!!AFTER");
+    Log.warn("!!!AFTER");
   }
 }
