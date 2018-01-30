@@ -54,7 +54,7 @@ class CoCoAllVariablesDefined(CoCo):
         for expr in expressions:
             for var in expr.getVariables():
                 symbol = var.getScope().resolveToSymbol(var.getCompleteName(), SymbolKind.VARIABLE)
-                # first test if the symbol has been defined at least
+                # first test_building_symboltable_for_all_neurons if the symbol has been defined at least
                 if symbol is None:
                     code, message = Messages.getNoVariableFound(var.getName())
                     Logger.logMessage(_neuron=_neuron, _code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR,

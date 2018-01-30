@@ -18,14 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from antlr4 import *
-from pynestml.generated.PyNESTMLParser import PyNESTMLParser
+
 from pynestml.generated.PyNESTMLLexer import PyNESTMLLexer
+from pynestml.generated.PyNESTMLParser import PyNESTMLParser
 from pynestml.modelprocessor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ASTBuilderVisitor import ASTBuilderVisitor
-from pynestml.modelprocessor.CoCosManager import CoCosManager
-from pynestml.modelprocessor.SymbolTable import SymbolTable
-from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.ASTHigherOrderVisitor import ASTHigherOrderVisitor
+from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
+from pynestml.modelprocessor.SymbolTable import SymbolTable
 from pynestml.utils.Logger import Logger, LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
@@ -36,7 +36,7 @@ class ModelParser(object):
     """
 
     @classmethod
-    def parseModel(cls, file_path=None):
+    def parse_model(cls, file_path):
         """
         Parses a handed over model and returns the ast representation of it.
         :param file_path: the path to the file which shall be parsed.
@@ -63,14 +63,14 @@ class ModelParser(object):
         astBuilderVisitor = ASTBuilderVisitor(stream.tokens)
         ast = astBuilderVisitor.visit(compilationUnit)
         # create and update the corresponding symbol tables
-        SymbolTable.initializeSymbolTable(ast.getSourcePosition())
+        SymbolTable.initialize_symbol_table(ast.getSourcePosition())
         for neuron in ast.getNeuronList():
             ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
-            SymbolTable.addNeuronScope(neuron.getName(), neuron.getScope())
+            SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())
         return ast
 
     @classmethod
-    def parseExpression(cls, _expression=None):
+    def parseExpression(cls, _expression):
         """
         Parses a single expression and returns the corresponding ast.
         :param _expression: a single expression.
@@ -78,7 +78,7 @@ class ModelParser(object):
         :return: a single expression
         :rtype: ASTExpression
         """
-        assert (_expression is not None and (isinstance(_expression, str) or isinstance(_expression, unicode))), \
+        assert ((isinstance(_expression, str) or isinstance(_expression, unicode))), \
             '(PyNestML.Parser) No or wrong type of expression provided (%s)!' % type(_expression)
         # raw = 'neuron raw: state: ' + _expression + ' end end'
         lexer = PyNESTMLLexer(InputStream(_expression))

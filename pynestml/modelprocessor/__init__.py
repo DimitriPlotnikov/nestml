@@ -1,7 +1,9 @@
+from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.PredefinedFunctions import PredefinedFunctions
 from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes
 from pynestml.modelprocessor.PredefinedUnits import PredefinedUnits
 from pynestml.modelprocessor.PredefinedVariables import PredefinedVariables
+from pynestml.modelprocessor.SymbolTable import SymbolTable
 
 __all__ = ['ASTArithmeticOperator', 'ASTIfStmt', 'ASTWhileStmt', 'CoCoOnlySpikeBufferDatatypes',
            'ModelParserExceptions',
@@ -34,3 +36,4 @@ PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedFunctions.registerPredefinedFunctions()
 PredefinedVariables.registerPredefinedVariables()
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))

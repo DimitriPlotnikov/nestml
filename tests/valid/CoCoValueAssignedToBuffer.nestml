@@ -20,7 +20,7 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test if broken CoCos are identified correctly. Here, if assignment of values to buffers
+ * This model is used to test_building_symboltable_for_all_neurons if broken CoCos are identified correctly. Here, if assignment of values to buffers
  * is detected.
  * Positive case.
 */
@@ -33,7 +33,7 @@ neuron CoCoValueAssignedToBuffer:
     output: spike
 
     update: # buffer not assigned, thus everything is correct
-        test integer = spikeInh  + 10
+        test_building_symboltable_for_all_neurons integer = spikeInh  + 10
     end
 
 end

@@ -37,7 +37,7 @@ PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedFunctions.registerPredefinedFunctions()
 PredefinedVariables.registerPredefinedVariables()
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 Logger.initLogger(LOGGING_LEVEL.NO)
 
 
@@ -51,8 +51,8 @@ class NESTMLTest(unittest.TestCase):
                                                                  os.path.join('..', 'models')))):
             if filename.endswith(".nestml"):
                 # print('Start creating AST for ' + filename + ' ...'),
-                model = ModelParser.parseModel(os.path.join(os.path.dirname(__file__),
-                                                            os.path.join(os.path.join('..', 'models'), filename)))
+                model = ModelParser.parse_model(os.path.join(os.path.dirname(__file__),
+                                                             os.path.join(os.path.join('..', 'models'), filename)))
                 assert (isinstance(model, ASTNESTMLCompilationUnit))
         return
 

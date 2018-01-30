@@ -20,7 +20,7 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test whether comments are detected and processed as such. Moreover, it tests
+ * This model is used to test_building_symboltable_for_all_neurons whether comments are detected and processed as such. Moreover, it tests
  * if all comments are attached to their respective elements.
 */
 
@@ -33,7 +33,7 @@ neuron commentTest:
 
     #pre comment 1 ok
     #pre comment 2 ok
-    test boolean = True #inline comment ok
+    test_building_symboltable_for_all_neurons boolean = True #inline comment ok
     #post comment 1 ok
     #post comment 2 ok
 
@@ -67,8 +67,8 @@ neuron commentTest:
     test2 boolean = True
 
     #block comment ok
-    if test == test2:
-        test = test2
+    if test_building_symboltable_for_all_neurons == test2:
+        test_building_symboltable_for_all_neurons = test2
     end
 
   end

@@ -32,7 +32,7 @@ class Scope(object):
         __enclosingScope The scope this scope is enclosed in. Type: Scope
         __declaredElements Elements declared in this scope, i.e., scopes and symbols. Type: list(Scope,Symbol)
         __scopeType The type of this scope. Type: ScopeType
-        __sourcePosition The position in the source file this scope spans over.
+        __source_position The position in the source file this scope spans over.
     """
     __enclosingScope = None
     __declaredElements = None

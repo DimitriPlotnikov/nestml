@@ -33,7 +33,7 @@ from pynestml.utils.Logger import Logger, LOGGING_LEVEL
 
 # minor setup steps required
 Logger.initLogger(LOGGING_LEVEL.NO)
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedVariables.registerPredefinedVariables()
@@ -42,11 +42,11 @@ PredefinedFunctions.registerPredefinedFunctions()
 
 class SymbolTableResolutionTest(unittest.TestCase):
     """
-    This test is used to check if the resolution of symbols works as expected.
+    This test_building_symboltable_for_all_neurons is used to check if the resolution of symbols works as expected.
     """
 
     def test(self):
-        model = ModelParser.parseModel(
+        model = ModelParser.parse_model(
             os.path.join(
                 os.path.realpath(os.path.join(os.path.dirname(__file__), 'resources', 'ResolutionTest.nestml'))))
         scope = model.getNeuronList()[0].getScope()

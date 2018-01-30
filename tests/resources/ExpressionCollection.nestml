@@ -20,8 +20,8 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This test neuron is used to test if parsing of expression works as required.
- * For more details see ExpressionParserTest.py. It is used to test the following part of the grammar:
+ * This test_building_symboltable_for_all_neurons neuron is used to test_building_symboltable_for_all_neurons if parsing of expression works as required.
+ * For more details see ExpressionParserTest.py. It is used to test_building_symboltable_for_all_neurons the following part of the grammar:
  * expression : leftParentheses='(' term=expression rightParentheses=')'
          | <assoc=right> left=expression powOp='**' right=expression
          | unaryOperator term=expression
@@ -441,7 +441,7 @@ neuron ExpressionCollection:
         PotassiumRefractoryCounts integer = steps(t_spike)
         integrate_odes()
         # Deactivate potassium current after spike time have expired
-        test = (r_potassium > 0) and (r_potassium-1 == 0)
+        test_building_symboltable_for_all_neurons = (r_potassium > 0) and (r_potassium-1 == 0)
         g_spike = false # Deactivate potassium current.
         r_potassium -= 1
         g_AMPA' += AMPAInitialValue * AMPA * nS/ms
@@ -452,7 +452,7 @@ neuron ExpressionCollection:
         # Set V and Theta to the sodium reversal potential.
         V_m = E_Na
         Theta = E_Na
-        test = PotassiumRefractoryCounts > 0
+        test_building_symboltable_for_all_neurons = PotassiumRefractoryCounts > 0
         g_spike = true
         g_spike = false
         r_potassium = PotassiumRefractoryCounts
@@ -460,7 +460,7 @@ neuron ExpressionCollection:
         exact_integration_adjustment real = ( ( 1 / Tau_2 ) - ( 1 / Tau_1 ) ) * ms
         t_peak real = ( Tau_2 * Tau_1 ) * log( Tau_2 / Tau_1 ) / ( Tau_2 - Tau_1 ) / ms
         normalisation_factor real = 1 / ( exp( -t_peak / Tau_1 ) - exp( -t_peak / Tau_2 ) )
-        test = g_peak * normalisation_factor * exact_integration_adjustment
+        test_building_symboltable_for_all_neurons = g_peak * normalisation_factor * exact_integration_adjustment
         ##########################
         ###iaf_chxk_2008_neuron###
         ##########################

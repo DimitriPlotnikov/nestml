@@ -42,7 +42,7 @@ PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedFunctions.registerPredefinedFunctions()
 PredefinedVariables.registerPredefinedVariables()
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 Logger.initLogger(LOGGING_LEVEL.NO)
 
 

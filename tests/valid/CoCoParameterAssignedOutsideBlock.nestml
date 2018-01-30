@@ -27,7 +27,7 @@
 neuron CoCoParameterAssignedOutsideBlock:
 
     parameters: # parameter is not assigned outside the block, thus everything is correct
-        test mV = 10mV
+        test_building_symboltable_for_all_neurons mV = 10mV
     end
 
     update:

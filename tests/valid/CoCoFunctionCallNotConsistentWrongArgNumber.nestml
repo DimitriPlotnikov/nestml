@@ -20,14 +20,14 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test if broken CoCos are identified correctly. Here, if current buffers are not specified by
+ * This model is used to test_building_symboltable_for_all_neurons if broken CoCos are identified correctly. Here, if current buffers are not specified by
  * keywords.
  * Positive case.
 */
 
 neuron CoCoFunctionCallNotConsistentWrongArgNumber:
     state:
-        test integer = max(1,2) # max is provided with correct number of arguments and types, thus everything is correct
+        test_building_symboltable_for_all_neurons integer = max(1,2) # max is provided with correct number of arguments and types, thus everything is correct
     end
 
     update:

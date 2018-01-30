@@ -20,28 +20,28 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test if broken CoCos are identified correctly. Here, if redeclaration of predefined functions
+ * This model is used to test_building_symboltable_for_all_neurons if broken CoCos are identified correctly. Here, if redeclaration of predefined functions
  * is detected.
  * Negative case.
 */
 
 neuron CoCoFunctionNotUnique:
     function delta(Tau_a ms,Tau_b ms) real: # redeclaration should be detected
-        test real = 1
+        test_building_symboltable_for_all_neurons real = 1
         return # missing return type should be detected
     end
 
     function deltaBoolean(Tau_a ms,Tau_b ms) boolean:
-        test real = 1
-        return test # here wrong type of return should be detected
+        test_building_symboltable_for_all_neurons real = 1
+        return test_building_symboltable_for_all_neurons # here wrong type of return should be detected
     end
 
     function deltaNoReturn(Tau_a ms,Tau_b ms) boolean:
-        test real = 1
+        test_building_symboltable_for_all_neurons real = 1
         if True == True:
             return True
         else:
-           test = test # here no return statement should be detected
+           test_building_symboltable_for_all_neurons = test_building_symboltable_for_all_neurons # here no return statement should be detected
         end
     end
 

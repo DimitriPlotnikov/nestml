@@ -33,8 +33,8 @@ python3 setup.py install
 Correct installation can be tested by 
 
 ```
-python setup.py test
-\# respectively python3 setup.py test 
+python setup.py test_building_symboltable_for_all_neurons
+\# respectively python3 setup.py test_building_symboltable_for_all_neurons
 ```
 
 In order to ensure correct installation and resolving of dependencies, Python's package manager [_pip_](https://pip.pypa.io/en/stable/installing/), the distribution tool [_setuptools_](https://packaging.python.org/tutorials/installing-packages/) as well as the python-dev package are required and should be installed in advance. The setup file additionally installs the following components:

@@ -35,7 +35,7 @@ from pynestml.utils.Logger import Logger, LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
 
 # minor setup steps required
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedVariables.registerPredefinedVariables()
@@ -66,7 +66,7 @@ class expressionTestVisitor(NESTMLVisitor):
                           _message=message, _logLevel=LOGGING_LEVEL.INFO)
 
         if _equals is False:
-            Logger.logMessage(_message="Type mismatch in test!",
+            Logger.logMessage(_message="Type mismatch in test_building_symboltable_for_all_neurons!",
                               _code=MessageCode.TYPE_MISMATCH,
                               _errorPosition=_assignment.getSourcePosition(),
                               _logLevel=LOGGING_LEVEL.ERROR)
@@ -75,11 +75,11 @@ class expressionTestVisitor(NESTMLVisitor):
 
 class ExpressionTypeCalculationTest(unittest.TestCase):
     """
-    A simple test that prints all top-level expression types in a file.
+    A simple test_building_symboltable_for_all_neurons that prints all top-level expression types in a file.
     """
     def test(self):
         Logger.initLogger(LOGGING_LEVEL.NO)
-        model = ModelParser.parseModel(
+        model = ModelParser.parse_model(
             os.path.join(os.path.realpath(os.path.join(os.path.dirname(__file__),
                                                        'resources', 'ExpressionTypeTest.nestml'))))
         Logger.setCurrentNeuron(model.getNeuronList()[0])

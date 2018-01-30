@@ -26,8 +26,8 @@
 */
 neuron CoCoElementNotDefined:
     state:
-        test integer = 0
-        test1 integer = test +1 # all reference are defined and declared, thus everything correct
+        test_building_symboltable_for_all_neurons integer = 0
+        test1 integer = test_building_symboltable_for_all_neurons +1 # all reference are defined and declared, thus everything correct
     end
 
     update:

@@ -20,48 +20,26 @@
 import os
 import unittest
 
-from antlr4 import *
-
-from pynestml.generated.PyNESTMLLexer import PyNESTMLLexer
-from pynestml.generated.PyNESTMLParser import PyNESTMLParser
-from pynestml.modelprocessor.ASTBuilderVisitor import ASTBuilderVisitor
 from pynestml.modelprocessor.ASTNESTMLCompilationUnit import ASTNESTMLCompilationUnit
-from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
-from pynestml.modelprocessor.ASTSymbolTableVisitor import ASTSymbolTableVisitor
-from pynestml.modelprocessor.SymbolTable import SymbolTable
+from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.utils.Logger import Logger, LOGGING_LEVEL
 
-# setups the infrastructure
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 Logger.initLogger(LOGGING_LEVEL.INFO)
 
 
 class SymbolTableBuilderTest(unittest.TestCase):
-    def test(self):
+
+    def test_building_symboltable_for_all_neurons(self):
         for filename in os.listdir(os.path.realpath(os.path.join(os.path.dirname(__file__),
                                                                  os.path.join('..', 'models')))):
             if filename.endswith(".nestml"):
-                inputFile = FileStream(
-                    os.path.join(os.path.dirname(__file__), os.path.join(os.path.join('..', 'models'), filename)))
+                file_path = os.path.join(os.path.dirname(__file__), os.path.join(os.path.join('..', 'models'), filename))
 
-                lexer = PyNESTMLLexer(inputFile)
-                # create a token stream
-                stream = CommonTokenStream(lexer)
-                stream.fill()
-                # parse the file
-                parser = PyNESTMLParser(stream)
-                # process the comments
-                compilationUnit = parser.nestmlCompilationUnit()
-                # create a new visitor and return the new AST
-                astBuilderVisitor = ASTBuilderVisitor(stream.tokens)
-                ast = astBuilderVisitor.visit(compilationUnit)
-                # update the corresponding symbol tables
-                SymbolTable.initializeSymbolTable(ast.getSourcePosition())
-                for neuron in ast.getNeuronList():
-                    ASTSymbolTableVisitor.updateSymbolTable(neuron)
-                    SymbolTable.addNeuronScope(_name=neuron.getName(), _scope=neuron.getScope())
+                ast = ModelParser.parse_model(file_path)
+
                 assert isinstance(ast, ASTNESTMLCompilationUnit)
-        return
+                for neuron in ast.getNeuronList():
+                    assert neuron.getScope() is not None
 
 
 if __name__ == '__main__':

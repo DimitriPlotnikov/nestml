@@ -40,7 +40,7 @@ PredefinedUnits.registerUnits()
 PredefinedTypes.registerTypes()
 PredefinedFunctions.registerPredefinedFunctions()
 PredefinedVariables.registerPredefinedVariables()
-SymbolTable.initializeSymbolTable(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
+SymbolTable.initialize_symbol_table(ASTSourcePosition(_startLine=0, _startColumn=0, _endLine=0, _endColumn=0))
 Logger.initLogger(LOGGING_LEVEL.NO)
 
 
@@ -51,7 +51,7 @@ class SpecialBlockParserBuilderTest(unittest.TestCase):
     """
 
     def test(self):
-        # print('Start special block parsing and AST-building test...'),
+        # print('Start special block parsing and AST-building test_building_symboltable_for_all_neurons...'),
         inputFile = FileStream(
             os.path.join(os.path.join(os.path.realpath(os.path.join(os.path.dirname(__file__), 'resources')),
                                       'BlockTest.nestml')))
