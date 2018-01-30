@@ -42,7 +42,7 @@ class SolverInput(object):
         self.__printer = ExpressionsPrettyPrinter()
         return
 
-    def SolverInputComplete(self, _equationsBlock=None):
+    def from_ode_with_shapes(self, _equationsBlock):
         """
         Standard constructor providing the basic functionality to transform equation blocks to json format.
         :param _equationsBlock: a single equation block.
@@ -51,30 +51,30 @@ class SolverInput(object):
         assert (_equationsBlock is not None and isinstance(_equationsBlock, ASTEquationsBlock)), \
             '(PyNestML.Solver.Input) No or wrong type of equations block provided (%s)!' % _equationsBlock
         workingCopy = OdeTransformer.replaceSumCalls(deepcopy(_equationsBlock))
-        self.__ode = self.printEquation(workingCopy.getOdeEquations()[0])
+        self.__ode = self.print_equation(workingCopy.getOdeEquations()[0])
         self.__functions = list()
         for func in workingCopy.getOdeFunctions():
-            self.__functions.append(self.printFunction(func))
+            self.__functions.append(self.print_function(func))
 
         self.__shapes = list()
         for shape in workingCopy.getOdeShapes():
-            self.__shapes.append(self.printShape(shape))
+            self.__shapes.append(self.print_shape(shape))
         return self
 
-    def SolverInputShapes(self, _shapes=None):
+    def from_shapes(self, _shapes):
         """
-        The same functionality as in the case of SolverInputComplete, but now only shapes are solved
+        The same functionality as in the case of from_ode_with_shapes, but now only shapes are solved
         :param _shapes: a list of shapes
         :type _shapes: list(ASTOdeShape)
         """
         self.__shapes = list()
         for shape in _shapes:
-            self.__shapes.append(self.printShape(shape))
+            self.__shapes.append(self.print_shape(shape))
         self.__ode = None
         self.__functions = list()
         return self
 
-    def printEquation(self, _equation=None):
+    def print_equation(self, _equation):
         """
         Prints an equation to a processable format.
         :param _equation: a single equation
@@ -86,7 +86,7 @@ class SolverInput(object):
             '(PyNestML.Solver.Input) No or wrong type of equation provided (%s)!' % type(_equation)
         return _equation.getLhs().getCompleteName() + ' = ' + self.__printer.printExpression(_equation.getRhs())
 
-    def printShape(self, _shape=None):
+    def print_shape(self, _shape=None):
         """
         Prints a single shape to a processable format.
         :param _shape: a single shape
@@ -99,7 +99,7 @@ class SolverInput(object):
         return _shape.getVariable().getCompleteName() + ' = ' \
                + self.__printer.printExpression(_shape.getExpression())
 
-    def printFunction(self, _function=None):
+    def print_function(self, _function=None):
         """
         Prints a single function to a processable format.
         :param _function: a single function
@@ -110,26 +110,3 @@ class SolverInput(object):
         assert (_function is not None and isinstance(_function, ASTOdeFunction)), \
             '(PyNestML.Solver.Input) No or wrong type of function provided (%s)!' % type(_function)
         return _function.getVariableName() + ' = ' + self.__printer.printExpression(_function.getExpression())
-
-    def toJSON(self):
-        """
-        Returns a json format string of all currently stored shapes,functions and equations.
-        :return: a string representation.
-        :rtype: str
-        """
-        temp = '{'
-        if self.__ode is not None:
-            temp += '"ode":"' + self.__ode + '",'
-        else:
-            temp += '"ode": null,'
-        temp += '"shapes":['
-        for shape in self.__shapes:
-            temp += '"' + shape + '",'
-        if len(self.__shapes) > 0:
-            temp = temp[:-1]
-        temp += '], "functions":['
-        for func in self.__functions:
-            temp += '"' + func + '",'
-        if len(self.__functions) > 0:
-            temp = temp[:-1]
-        return temp + ']}'

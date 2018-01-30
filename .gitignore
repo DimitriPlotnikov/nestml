@@ -17,7 +17,7 @@ PyNESTML.egg-info/
 
 pynestml/grammars/antlr-4.7-complete.jar
 
-
+.cache
 .DS_Store
 .project
 .classpath

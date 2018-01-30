@@ -1,3 +1,8 @@
+from pynestml.modelprocessor.PredefinedFunctions import PredefinedFunctions
+from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes
+from pynestml.modelprocessor.PredefinedUnits import PredefinedUnits
+from pynestml.modelprocessor.PredefinedVariables import PredefinedVariables
+
 __all__ = ['ASTArithmeticOperator', 'ASTIfStmt', 'ASTWhileStmt', 'CoCoOnlySpikeBufferDatatypes',
            'ModelParserExceptions',
            'ASTAssignment', 'ASTInputBlock', 'BinaryLogicVisitor', 'CoCoParametersAssignedOnlyInParameterBlock',
@@ -24,3 +29,8 @@ __all__ = ['ASTArithmeticOperator', 'ASTIfStmt', 'ASTWhileStmt', 'CoCoOnlySpikeB
            'CoCoNoNestNameSpaceCollision', 'LineOperationVisitor', 'VariableSymbol', 'ASTHigherOrderVisitor',
            'ASTUpdateBlock', 'CoCoNoShapesExceptInConvolve', 'LogicalNotVisitor', 'VariableVisitor',
            'ASTIfClause', 'ASTVariable', 'CoCoNoTwoNeuronsInSetOfCompilationUnits', 'NESTMLParentAwareVisitor']
+
+PredefinedUnits.registerUnits()
+PredefinedTypes.registerTypes()
+PredefinedFunctions.registerPredefinedFunctions()
+PredefinedVariables.registerPredefinedVariables()

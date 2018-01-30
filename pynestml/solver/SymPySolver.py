@@ -17,9 +17,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
+import odetoolbox
 from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
 from pynestml.solver.SolverInput import SolverInput
-from pynestml.solver.OdeAnalyzer import OdeAnalyzer
 from pynestml.solver.SolverOutput import SolverOutput
 
 
@@ -29,19 +29,19 @@ class SymPySolver(object):
     """
 
     @classmethod
-    def solveOdeWithShapes(self, _odeDeclaration=None):
+    def solveOdeWithShapes(self, _ode_declaration=None):
         """
         Solves the odes for the handed over declarations block.
-        :param _odeDeclaration: a single block of declarations.
-        :type _odeDeclaration: ASTEquationsBlock
+        :param _ode_declaration: a single block of declarations.
+        :type _ode_declaration: ASTEquationsBlock
         :return: the output of the solver
         :rtype: SolverOutput
         """
-        inputProcessor = SolverInput()
-        inputJSON = inputProcessor.SolverInputComplete(_odeDeclaration)
-        output = OdeAnalyzer.compute_solution(inputJSON.toJSON())
-        toOutput = SolverOutput()
-        return toOutput.fromJSON(output)
+        input_processor = SolverInput()
+        input_json = input_processor.from_ode_with_shapes(_ode_declaration)
+        output = odetoolbox.analysis(input_json.toJSON())
+        to_output = SolverOutput()
+        return to_output.fromJSON(output)
 
     @classmethod
     def solveShapes(cls, _shapes=None):
@@ -52,8 +52,8 @@ class SymPySolver(object):
         :return: a solver output object
         :rtype: SolverOutput
         """
-        inputProcessor = SolverInput()
-        inputJSON = inputProcessor.SolverInputShapes(_shapes)
-        output = OdeAnalyzer.compute_solution(inputJSON.toJSON())
-        toOutput = SolverOutput()
-        return toOutput.fromJSON(output)
+        input_processor = SolverInput()
+        input_json = input_processor.from_shapes(_shapes)
+        output = odetoolbox.analysis(input_json.toJSON())
+        to_output = SolverOutput()
+        return to_output.fromJSON(output)
