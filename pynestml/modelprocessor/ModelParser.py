@@ -36,7 +36,7 @@ class ModelParser(object):
     """
 
     @classmethod
-    def parse_model(cls, file_path):
+    def parse_file_and_build_symboltable(cls, file_path):
         """
         Parses a handed over model and returns the ast representation of it.
         :param file_path: the path to the file which shall be parsed.

@@ -17,6 +17,7 @@ PyNESTML.egg-info/
 
 pynestml/grammars/antlr-4.7-complete.jar
 
+venv/
 .cache
 .DS_Store
 .project

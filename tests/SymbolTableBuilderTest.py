@@ -35,7 +35,7 @@ class SymbolTableBuilderTest(unittest.TestCase):
             if filename.endswith(".nestml"):
                 file_path = os.path.join(os.path.dirname(__file__), os.path.join(os.path.join('..', 'models'), filename))
 
-                ast = ModelParser.parse_model(file_path)
+                ast = ModelParser.parse_file_and_build_symboltable(file_path)
 
                 assert isinstance(ast, ASTNESTMLCompilationUnit)
                 for neuron in ast.getNeuronList():

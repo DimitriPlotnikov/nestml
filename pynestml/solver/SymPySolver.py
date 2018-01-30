@@ -25,11 +25,11 @@ from pynestml.solver.SolverOutput import SolverOutput
 
 class SymPySolver(object):
     """
-    This class represents a collection of concepts as used to solve equations.
+    This class manages the communication with SymPy solver backend.
     """
 
     @classmethod
-    def solveOdeWithShapes(self, _ode_declaration=None):
+    def solve_ode_with_shapes(cls, _ode_declaration):
         """
         Solves the odes for the handed over declarations block.
         :param _ode_declaration: a single block of declarations.
@@ -44,7 +44,7 @@ class SymPySolver(object):
         return to_output.fromJSON(output)
 
     @classmethod
-    def solveShapes(cls, _shapes=None):
+    def transform_shapes_to_odes(cls, _shapes):
         """
         Solves a set of shapes to a corresponding set of ode declarations.
         :param _shapes: a list of shapes

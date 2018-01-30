@@ -51,7 +51,7 @@ class EquationsBlockProcessor(object):
             if len(workingVersion.getEquationsBlocks().getOdeShapes()) > 0 and \
                     not cls.__odeShapeExists(workingVersion.getEquationsBlocks().getOdeShapes()) and \
                             len(workingVersion.getEquationsBlocks().getOdeEquations()) == 1:
-                output = SymPySolver.solveOdeWithShapes(deepCopy.getEquationsBlocks())
+                output = SymPySolver.solve_ode_with_shapes(deepCopy.getEquationsBlocks())
                 if not output.status == 'success':
                     code, message = Messages.getCouldNotBeSolved()
                     Logger.logMessage(_neuron=_neuron,
@@ -90,7 +90,7 @@ class EquationsBlockProcessor(object):
                                   _message=message, _code=code,
                                   _errorPosition=_neuron.getEquationsBlocks().getSourcePosition(),
                                   _logLevel=LOGGING_LEVEL.INFO)
-                solverOutput = SymPySolver.solveShapes(deepCopy.getEquationsBlocks().getOdeShapes())
+                solverOutput = SymPySolver.transform_shapes_to_odes(deepCopy.getEquationsBlocks().getOdeShapes())
                 workingVersion = ShapesToOdesTransformer.transformShapesToOdeForm(_neuron, solverOutput)
             else:
                 TransformerBase.applyIncomingSpikes(workingVersion)

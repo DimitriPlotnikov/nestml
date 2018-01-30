@@ -79,7 +79,7 @@ class ExpressionTypeCalculationTest(unittest.TestCase):
     """
     def test(self):
         Logger.initLogger(LOGGING_LEVEL.NO)
-        model = ModelParser.parse_model(
+        model = ModelParser.parse_file_and_build_symboltable(
             os.path.join(os.path.realpath(os.path.join(os.path.dirname(__file__),
                                                        'resources', 'ExpressionTypeTest.nestml'))))
         Logger.setCurrentNeuron(model.getNeuronList()[0])
