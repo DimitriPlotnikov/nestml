@@ -19,7 +19,7 @@
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from pynestml.modelprocessor.PredefinedFunctions import PredefinedFunctions
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from copy import copy
+from copy import copy, deepcopy
 
 
 class OdeTransformer(object):
@@ -44,18 +44,18 @@ class OdeTransformer(object):
         return workingCopy
 
     @classmethod
-    def replaceSumCalls(cls, _ast):
+    def refactor_convolve_call(cls, _ast):
         """
-        Replaces all sum calls in the handed over node.
+        Replaces all `convolve` calls in the handed over node.
         :param _ast: a single node
         :type _ast: AST_
         """
         assert (_ast is not None), '(PyNestML.Utils) No ast provided!'
-        workingCopy = copy(_ast)
-        functionCalls = cls.get_sumFunctionCalls(workingCopy)
-        for call in functionCalls:
-            cls.replaceFunctionCallThroughFirstArgument(workingCopy, call)
-        return _ast
+        working_copy = deepcopy(_ast)
+        function_calls = cls.get_sumFunctionCalls(working_copy)
+        for call in function_calls:
+            cls.replaceFunctionCallThroughFirstArgument(working_copy, call)
+        return working_copy
 
     @classmethod
     def replaceFunctionCallThroughFirstArgument(cls, _ast=None, _toReplace=None):

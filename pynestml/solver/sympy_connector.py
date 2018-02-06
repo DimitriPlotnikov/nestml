@@ -35,16 +35,19 @@ def transform_ode_and_shapes_to_json(equations_block):
     :return: json mapping: {odes: [...], shape: [...]}
     """
     printer = ExpressionsPrettyPrinter()
+    equations_block = OdeTransformer.refactor_convolve_call(equations_block)
     result = {"odes": [], "shapes": []}
 
     for equation in equations_block.get_equations():
-        result["odes"].append({"symbol": equation.getLhs().getCompleteName(),
+        result["odes"].append({"symbol": equation.getLhs().getName(),
                                "definition": printer.printExpression(equation.getRhs())})
 
     for shape in equations_block.get_shapes():
-        result["shapes"].append({"symbol": shape.getVariable().getCompleteName(),
+        result["shapes"].append({"type": "function",
+                                 "symbol": shape.getVariable().getCompleteName(),
                                  "definition": printer.printExpression(shape.getExpression())})
 
+    result["parameters"] = []  # ode-framework requires this.
     return result
 
 
@@ -56,6 +59,7 @@ def transform_functions_json(equations_block):
     :return: json mapping: {odes: [...], shape: [...]}
     """
     printer = ExpressionsPrettyPrinter()
+    equations_block = OdeTransformer.refactor_convolve_call(equations_block)
     result = []
 
     for fun in equations_block.get_functions():
@@ -64,7 +68,7 @@ def transform_functions_json(equations_block):
 
     return result
 
-## TODO write and test extract functions
+
 def prepare_functions(functions):
     """
     Make function definition self contained, e.g. without any references to functions from `functions`.
@@ -87,11 +91,11 @@ def refactor(definitions, functions):
     must be replaced in `definitions`.
     :return: A list with definitions. Expressions in `definitions` don't depend on functions from `functions`.
     """
-    functions = deepcopy(functions)
+    definitions = deepcopy(definitions)
     for fun in functions:
         for definition in definitions:
             definition["definition"] = definition["definition"].replace(fun["symbol"], fun["definition"])
-    return functions
+    return definitions
 
 
 class SolverInput(object):
@@ -118,7 +122,7 @@ class SolverInput(object):
         assert (isinstance(_equations_block, ASTEquationsBlock)), \
             '(PyNestML.Solver.Input) Wrong type of equations block provided (%s)!' % _equations_block
         working_copy = deepcopy(_equations_block)
-        working_copy = OdeTransformer.replaceSumCalls(working_copy)
+        working_copy = OdeTransformer.refactor_convolve_call(working_copy)
         self.__ode = self.print_equation(working_copy.get_equations()[0])
         self.__functions = list()
 

@@ -41,7 +41,7 @@ class SolverConnectorTest(TestCase):
         odes_shapes_json = transform_ode_and_shapes_to_json(equations_block)
 
         for k in odes_shapes_json:
-            self.assertTrue(k is "odes" or k is "shapes")
+            self.assertTrue(k is "odes" or k is "shapes" or k is "parameters")
             self.assertTrue(len(odes_shapes_json["odes"]) > 0)
             self.assertTrue(len(odes_shapes_json["shapes"]) > 0)
 
@@ -52,3 +52,7 @@ class SolverConnectorTest(TestCase):
         odes_shapes_json["odes"] = refactor(odes_shapes_json["odes"], functions_json)
         self.assertTrue("currents" in odes_shapes_json["odes"][0]["definition"])
         print(str(odes_shapes_json))
+
+        from odetoolbox import analysis
+
+        self.assertTrue(analysis(odes_shapes_json)["solver"] is "analytical")
