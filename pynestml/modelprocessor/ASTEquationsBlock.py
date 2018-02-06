@@ -95,7 +95,7 @@ class ASTEquationsBlock(ASTElement):
                 return decl.getParent(_ast)
         return None
 
-    def getOdeEquations(self):
+    def get_equations(self):
         """
         Returns a list of all ode equations in this block.
         :return: a list of all ode equations.
@@ -107,7 +107,7 @@ class ASTEquationsBlock(ASTElement):
                 ret.append(decl)
         return ret
 
-    def getOdeShapes(self):
+    def get_shapes(self):
         """
         Returns a list of all ode shapes in this block.
         :return: a list of all ode shapes.
@@ -119,7 +119,7 @@ class ASTEquationsBlock(ASTElement):
                 ret.append(decl)
         return ret
 
-    def getOdeFunctions(self):
+    def get_functions(self):
         """
         Returns a list of all ode functions in this block.
         :return: a list of all ode shapes.

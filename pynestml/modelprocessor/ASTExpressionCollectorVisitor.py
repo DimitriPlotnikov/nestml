@@ -52,8 +52,8 @@ class ASTExpressionCollectorVisitor(object):
             ret.extend(cls.collectExpressionsInParametersBlock(_neuron.getParameterBlocks()))
         if _neuron.getUpdateBlocks() is not None:
             ret.extend(cls.collectExpressionInUpdateBlock(_neuron.getUpdateBlocks()))
-        if _neuron.getEquationsBlocks() is not None:
-            ret.extend(cls.collectExpressionsInEquationsBlock(_neuron.getEquationsBlocks()))
+        if _neuron.get_equations_blocks() is not None:
+            ret.extend(cls.collectExpressionsInEquationsBlock(_neuron.get_equations_blocks()))
         if _neuron.getFunctions() is not None:
             for func in _neuron.getFunctions():
                 ret.extend(cls.collectExpressionsInFunctionBlock(func))

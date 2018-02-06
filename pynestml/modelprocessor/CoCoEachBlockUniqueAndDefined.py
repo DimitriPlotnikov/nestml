@@ -73,7 +73,7 @@ class CoCoEachBlockUniqueAndDefined(CoCo):
             Logger.logMessage(_code=code, _message=message, _neuron=_neuron, _errorPosition=_neuron.getSourcePosition()
                               , _logLevel=LOGGING_LEVEL.ERROR)
         # check that equations block is defined at most once
-        if isinstance(_neuron.getEquationsBlocks(), list) and len(_neuron.getEquationsBlocks()) > 1:
+        if isinstance(_neuron.get_equations_blocks(), list) and len(_neuron.get_equations_blocks()) > 1:
             code, message = Messages.getBlockNotDefinedCorrectly('Equations', False)
             Logger.logMessage(_code=code, _message=message, _neuron=_neuron, _errorPosition=_neuron.getSourcePosition()
                               , _logLevel=LOGGING_LEVEL.ERROR)

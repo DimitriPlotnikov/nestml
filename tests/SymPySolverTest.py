@@ -8,5 +8,6 @@ class TestSymPySolver(TestCase):
         compilation_unit = ModelParser.parse_file_and_build_symboltable("../models/iaf_psc_alpha.nestml")
 
 
+
     def test_transform_shapes_to_odes(self):
         self.fail()

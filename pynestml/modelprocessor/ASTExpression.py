@@ -65,9 +65,18 @@ class ASTExpression(ASTElement):
     # the corresponding type symbol.
     __typeEither = None
 
-    def __init__(self, _isEncapsulated=False, _unaryOperator=None, _isLogicalNot=False,
-                 _expression=None, _lhs=None, _binaryOperator=None, _rhs=None, _condition=None, _ifTrue=None,
-                 _ifNot=None, _sourcePosition=None):
+    def __init__(self,
+                 _isEncapsulated=False,
+                 _unaryOperator=None,
+                 _isLogicalNot=False,
+                 _expression=None,
+                 _lhs=None,
+                 _binaryOperator=None,
+                 _rhs=None,
+                 _condition=None,
+                 _ifTrue=None,
+                 _ifNot=None,
+                 _sourcePosition=None):
         """
         Standard constructor.
         :param _isEncapsulated: is encapsulated in brackets.
@@ -221,6 +230,12 @@ class ASTExpression(ASTElement):
         """
         return self.__expression is not None
 
+    def set_expression(self, _expression):
+        """
+        Sets the expression.
+        """
+        self.__expression = _expression
+
     def getExpression(self):
         """
         Returns the expression.
@@ -228,6 +243,9 @@ class ASTExpression(ASTElement):
         :rtype: ASTExpression
         """
         return self.__expression
+
+    def set_encapsulated(self, _isEncapsulated):
+        self.__isEncapsulated = _isEncapsulated
 
     def isEncapsulated(self):
         """
@@ -277,6 +295,14 @@ class ASTExpression(ASTElement):
         """
         return self.__lhs
 
+    def set_lhs(self, expression):
+        """
+        Returns the right-hand side expression.
+        :return: the right-hand side expression.
+        :rtype: ASTExpression
+        """
+        self.__lhs = expression
+
     def getRhs(self):
         """
         Returns the right-hand side expression.
@@ -284,6 +310,14 @@ class ASTExpression(ASTElement):
         :rtype: ASTExpression
         """
         return self.__rhs
+
+    def set_rhs(self, expression):
+        """
+        Returns the right-hand side expression.
+        :return: the right-hand side expression.
+        :rtype: ASTExpression
+        """
+        self.__rhs = expression
 
     def getBinaryOperator(self):
         """

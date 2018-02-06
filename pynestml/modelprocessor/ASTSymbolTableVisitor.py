@@ -70,8 +70,8 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
             '(PyNestML.SymbolTable.Visitor) No or wrong type of neuron provided (%s)!' % type(_neuron)
         # before starting the work on the neuron, make everything which was implicit explicit
         # but if we have a model without an equations block, just skip this step
-        if _neuron.getEquationsBlocks() is not None:
-            cls.makeImplicitOdesExplicit(_neuron.getEquationsBlocks())
+        if len(_neuron.get_equations_blocks()) == 1:
+            cls.makeImplicitOdesExplicit(_neuron.get_equations_block())
         scope = Scope(_scopeType=ScopeType.GLOBAL, _sourcePosition=_neuron.getSourcePosition())
         _neuron.updateScope(scope)
         _neuron.getBody().updateScope(scope)
@@ -87,21 +87,20 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
         # before following checks occur, we need to ensure several simple properties
         CoCosManager.postSymbolTableBuilderChecks(_neuron)
         # the following part is done in order to mark conductance based buffers as such.
-        if _neuron.getInputBlocks() is not None and _neuron.getEquationsBlocks() is not None and \
-                        len(_neuron.getEquationsBlocks().getDeclarations()) > 0:
+        if _neuron.getInputBlocks() is not None and len(_neuron.get_equations_blocks()) == 1 and \
+                        len(_neuron.get_equations_block().getDeclarations()) > 0:
             # this case should be prevented, since several input blocks result in  a incorrect model
             if isinstance(_neuron.getInputBlocks(), list):
                 buffers = (buffer for bufferA in _neuron.getInputBlocks() for buffer in bufferA.getInputLines())
             else:
                 buffers = (buffer for buffer in _neuron.getInputBlocks().getInputLines())
             from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
-            odeDeclarations = (decl for decl in _neuron.getEquationsBlocks().getDeclarations() if
+            odeDeclarations = (decl for decl in _neuron.get_equations_block().getDeclarations() if
                                not isinstance(decl, ASTOdeShape))
             cls.markConductanceBasedBuffers(_inputLines=buffers, _odeDeclarations=odeDeclarations)
         # now update the equations
-        if _neuron.getEquationsBlocks() is not None and len(_neuron.getEquationsBlocks().getDeclarations()) > 0:
-            equationBlock = _neuron.getEquationsBlocks()
-            cls.assignOdeToVariables(equationBlock)
+        if len(_neuron.get_equations_blocks()) == 1:
+            cls.assignOdeToVariables(_neuron.get_equations_block())
         CoCosManager.postOdeSpecificationChecks(_neuron)
         return
 
@@ -871,7 +870,7 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
                 # check for each smaller order if it is defined
                 for i in range(1, order):
                     found = False
-                    for shape in _equationsBlock.getOdeShapes():
+                    for shape in _equationsBlock.get_shapes():
                         if shape.getVariable().getName() == declaration.getVariable().getName() and \
                                         shape.getVariable().getDifferentialOrder() == i:
                             found = True
@@ -899,7 +898,7 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
                 # check for each smaller order if it is defined
                 for i in range(1, order):
                     found = False
-                    for ode in _equationsBlock.getOdeEquations():
+                    for ode in _equationsBlock.get_equations():
                         if ode.getLhs().getName() == declaration.getLhs().getName() and \
                                         ode.getLhs().getDifferentialOrder() == i:
                             found = True

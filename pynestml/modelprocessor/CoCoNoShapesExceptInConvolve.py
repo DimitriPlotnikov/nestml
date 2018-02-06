@@ -107,7 +107,7 @@ class ShapeUsageVisitor(NESTMLVisitor):
 
 
 class ShapeCollectingVisitor(NESTMLVisitor):
-    __shapeNames = None
+    __shapeNames = list()
 
     def collectShapes(self, _neuron=None):
         """
@@ -117,7 +117,6 @@ class ShapeCollectingVisitor(NESTMLVisitor):
         :return: a list of shapes.
         :rtype: list(str)
         """
-        self.__shapeNames = list()
         _neuron.accept(self)
         return self.__shapeNames
 

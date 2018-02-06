@@ -65,7 +65,7 @@ class ExactSolutionTransformer(TransformerBase):
                                                                                 _solverOutput.ode_var_update_instructions)
         TransformerBase.applyIncomingSpikes(workingVersion)
         # get rid of the ODE stuff since the model is solved exactly and all ODEs are removed.
-        workingVersion.getEquationsBlocks().clear()
+        workingVersion.get_equations_blocks().clear()
 
         for variable in stateShapeVariablesWithInitialValues:
             _neuron.addToStateBlock(ASTCreator.createDeclaration(variable[0] + ' real'))

@@ -45,7 +45,7 @@ class ShapesToOdesTransformer(TransformerBase):
             '(PyNestML.Solver.DeltaSolution) No or wrong type of output provided (%s)!' % _solverOutput
         assert (_neuron is not None and isinstance(_neuron, ASTNeuron)), \
             '(PyNestML.Solver.DeltaSolution) No or wrong type of neuron provided (%s)!' % _neuron
-        assert (_neuron.getEquationsBlocks() is not None), \
+        assert (_neuron.get_equations_blocks() is not None), \
             '(PyNestML.Solver.DeltaSolution) Equations block must not be empty!'
         stateShapeVariablesWithInitialValues = TransformerBase.computeShapeStateVariablesWithInitialValues(
             _solverOutput)
@@ -53,7 +53,7 @@ class ShapesToOdesTransformer(TransformerBase):
         # TODO by KP: actually, only shapes that are solved must be reseted, @KP solve this by checking which shapes are now with vars
         cls.__removeShapes(workingVersion)
         cls.__addStateShapeEquationsToEquationsBlock(_solverOutput.shape_state_odes,
-                                                     workingVersion.getEquationsBlocks())
+                                                     workingVersion.get_equations_blocks())
         TransformerBase.applyIncomingSpikes(workingVersion)
         return workingVersion
 
@@ -89,7 +89,7 @@ class ShapesToOdesTransformer(TransformerBase):
         """
         assert (_neuron is not None and isinstance(_neuron, ASTNeuron)), \
             '(PyNestML.Solver.DeltaSolution) No or wrong type of neuron provided (%s)!' % type(_neuron)
-        if _neuron.getEquationsBlocks() is not None:
-            for shape in _neuron.getEquationsBlocks().getOdeShapes():
-                _neuron.getEquationsBlocks().getDeclarations().remove(shape)
+        if _neuron.get_equations_blocks() is not None:
+            for shape in _neuron.get_equations_blocks().get_shapes():
+                _neuron.get_equations_blocks().getDeclarations().remove(shape)
         return

@@ -27,4 +27,6 @@ script:
   - python tests/PyNestMLFrontendTest.py
   - python tests/NESTMLTest.py
   - python tests/ExpressionTypeCalculationTest.py
+  - python tests/SymPySolverTest.py
+  - python tests/SolverInputTest.py
 

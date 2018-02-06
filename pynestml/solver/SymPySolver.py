@@ -19,7 +19,7 @@
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 import odetoolbox
 from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
-from pynestml.solver.SolverInput import SolverInput
+from pynestml.solver.sympy_connector import SolverInput
 from pynestml.solver.SolverOutput import SolverOutput
 
 

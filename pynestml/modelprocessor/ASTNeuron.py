@@ -206,7 +206,17 @@ class ASTNeuron(ASTElement):
         else:
             return ret
 
-    def getEquationsBlocks(self):
+    def get_equations_block(self):
+        """
+        Returns the unique equations block defined in this body.
+        :return: a  equations-block.
+        :rtype: list(ASTEquationsBlock)
+        """
+        blocks = self.get_equations_blocks()
+        assert len(blocks) == 1
+        return blocks[0]
+
+    def get_equations_blocks(self):
         """
         Returns a list of all equations BLOCKS defined in this body.
         :return: a list of equations-blocks.
@@ -217,12 +227,7 @@ class ASTNeuron(ASTElement):
         for elem in self.getBody().getBodyElements():
             if isinstance(elem, ASTEquationsBlock):
                 ret.append(elem)
-        if isinstance(ret, list) and len(ret) == 1:
-            return ret[0]
-        elif isinstance(ret, list) and len(ret) == 0:
-            return None
-        else:
-            return ret
+        return ret
 
     def getInitialValuesDeclarations(self):
         """
@@ -245,13 +250,13 @@ class ASTNeuron(ASTElement):
         """
         from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
         ret = list()
-        blocks = self.getEquationsBlocks()
+        blocks = self.get_equations_blocks()
         # the get equations block is not deterministic method, it can return a list or a single object.
         if isinstance(blocks, list):
             for block in blocks:
-                ret.extend(block.getOdeEquations())
+                ret.extend(block.get_equations())
         elif isinstance(blocks, ASTEquationsBlock):
-            return blocks.getOdeEquations()
+            return blocks.get_equations()
         else:
             return ret
 

@@ -177,7 +177,8 @@ class ASTBuilderVisitor(ParseTreeVisitor):
             return ASTExpression.makeExpression(_isEncapsulated=isEncapsulated,
                                                 _isLogicalNot=isLogicalNot,
                                                 _unaryOperator=unaryOperator,
-                                                _expression=expression, _sourcePosition=sourcePos)
+                                                _expression=expression,
+                                                _sourcePosition=sourcePos)
         elif (lhs is not None) and (rhs is not None) and (binaryOperator is not None):
             return ASTExpression.makeCompoundExpression(_lhs=lhs, _binaryOperator=binaryOperator,
                                                         _rhs=rhs, _sourcePosition=sourcePos)

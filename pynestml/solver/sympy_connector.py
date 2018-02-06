@@ -1,5 +1,5 @@
 #
-# SolverInput.py
+# sympy_connector.py
 #
 # This file is part of NEST.
 #
@@ -17,22 +17,89 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
-from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
-from pynestml.modelprocessor.ASTOdeFunction import ASTOdeFunction
-from pynestml.modelprocessor.ASTOdeEquation import ASTOdeEquation
-from pynestml.utils.OdeTransformer import OdeTransformer
-from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
 from copy import deepcopy
+
+from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
+from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
+from pynestml.modelprocessor.ASTOdeEquation import ASTOdeEquation
+from pynestml.modelprocessor.ASTOdeFunction import ASTOdeFunction
+from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
+from pynestml.utils.OdeTransformer import OdeTransformer
+
+
+def transform_ode_and_shapes_to_json(equations_block):
+    # type: (ASTEquationsBlock) -> dict[str, list]
+    """
+    Converts AST node to a JSON representation
+    :param equations_block:equations_block
+    :return: json mapping: {odes: [...], shape: [...]}
+    """
+    printer = ExpressionsPrettyPrinter()
+    result = {"odes": [], "shapes": []}
+
+    for equation in equations_block.get_equations():
+        result["odes"].append({"symbol": equation.getLhs().getCompleteName(),
+                               "definition": printer.printExpression(equation.getRhs())})
+
+    for shape in equations_block.get_shapes():
+        result["shapes"].append({"symbol": shape.getVariable().getCompleteName(),
+                                 "definition": printer.printExpression(shape.getExpression())})
+
+    return result
+
+
+def transform_functions_json(equations_block):
+    # type: (ASTEquationsBlock) -> list[dict[str, str]]
+    """
+    Converts AST node to a JSON representation
+    :param equations_block:equations_block
+    :return: json mapping: {odes: [...], shape: [...]}
+    """
+    printer = ExpressionsPrettyPrinter()
+    result = []
+
+    for fun in equations_block.get_functions():
+        result.append({"symbol": fun.getVariableName(),
+                       "definition": printer.printExpression(fun.getExpression())})
+
+    return result
+
+## TODO write and test extract functions
+def prepare_functions(functions):
+    """
+    Make function definition self contained, e.g. without any references to functions from `functions`.
+    :param functions: A sorted list with entries {"symbol": "name", "definition": "expression"}.
+    :return: A list with entries {"symbol": "name", "definition": "expression"}. Expressions don't depend on each other.
+    """
+    functions = deepcopy(functions)
+    for source in functions:
+        for target in functions:
+            target["definition"] = target["definition"].replace(source["symbol"], source["definition"])
+    return functions
+
+
+def refactor(definitions, functions):
+    """
+    Refactors symbols form `functions` in `definitions` with corresponding defining expressions from `functions`.
+    :param definitions: A sorted list with entries {"symbol": "name", "definition": "expression"} that should be made
+    free from.
+    :param functions: A sorted list with entries {"symbol": "name", "definition": "expression"} with functions which
+    must be replaced in `definitions`.
+    :return: A list with definitions. Expressions in `definitions` don't depend on functions from `functions`.
+    """
+    functions = deepcopy(functions)
+    for fun in functions:
+        for definition in definitions:
+            definition["definition"] = definition["definition"].replace(fun["symbol"], fun["definition"])
+    return functions
 
 
 class SolverInput(object):
     """
     Captures the ODE block for the processing in the SymPy. Generates corresponding json representation.
     """
-    __functions = None
-    __shapes = None
-    __ode = None
+    __shapes = []
+    __odes = []
     __printer = None
 
     def __init__(self):
@@ -42,22 +109,21 @@ class SolverInput(object):
         self.__printer = ExpressionsPrettyPrinter()
         return
 
-    def from_ode_with_shapes(self, _equationsBlock):
+    def from_ode_with_shapes(self, _equations_block):
         """
         Standard constructor providing the basic functionality to transform equation blocks to json format.
-        :param _equationsBlock: a single equation block.
-        :type _equationsBlock: ASTEquationsBlock
+        :param _equations_block: a single equation block.
+        :type _equations_block: ASTEquationsBlock
         """
-        assert (_equationsBlock is not None and isinstance(_equationsBlock, ASTEquationsBlock)), \
-            '(PyNestML.Solver.Input) No or wrong type of equations block provided (%s)!' % _equationsBlock
-        workingCopy = OdeTransformer.replaceSumCalls(deepcopy(_equationsBlock))
-        self.__ode = self.print_equation(workingCopy.getOdeEquations()[0])
+        assert (isinstance(_equations_block, ASTEquationsBlock)), \
+            '(PyNestML.Solver.Input) Wrong type of equations block provided (%s)!' % _equations_block
+        working_copy = deepcopy(_equations_block)
+        working_copy = OdeTransformer.replaceSumCalls(working_copy)
+        self.__ode = self.print_equation(working_copy.get_equations()[0])
         self.__functions = list()
-        for func in workingCopy.getOdeFunctions():
-            self.__functions.append(self.print_function(func))
 
         self.__shapes = list()
-        for shape in workingCopy.getOdeShapes():
+        for shape in working_copy.get_shapes():
             self.__shapes.append(self.print_shape(shape))
         return self
 

@@ -213,9 +213,9 @@ class NestCodeGenerator(object):
         assert (_neuron is not None and isinstance(_neuron, ASTNeuron)), \
             '(PyNestML.CodeGeneration.CodeGenerator) No or wrong type of neuron provided (%s)!' % type(_neuron)
         _namespace['useGSL'] = False
-        if _neuron.getEquationsBlocks() is not None and len(_neuron.getEquationsBlocks().getDeclarations()) > 0:
-            if (not self.functionShapeExists(_neuron.getEquationsBlocks().getOdeShapes())) or \
-                            len(_neuron.getEquationsBlocks().getOdeEquations()) > 1:
+        if _neuron.get_equations_blocks() is not None and len(_neuron.get_equations_blocks().getDeclarations()) > 0:
+            if (not self.functionShapeExists(_neuron.get_equations_blocks().get_shapes())) or \
+                            len(_neuron.get_equations_blocks().get_equations()) > 1:
                 _namespace['names'] = GSLNamesConverter()
                 _namespace['useGSL'] = True
                 converter = NESTReferenceConverter(_usesGSL=True)
@@ -248,11 +248,11 @@ class NestCodeGenerator(object):
         :rtype: ASTNeuron
         """
         # it should be ensured that most one equations block is present
-        equationsBlock = _neuron.getEquationsBlocks()
+        equationsBlock = _neuron.get_equations_blocks()
         if equationsBlock is None:
             return _neuron
         else:
-            if len(equationsBlock.getOdeEquations()) > 1 and len(equationsBlock.getOdeShapes()) == 0:
+            if len(equationsBlock.get_equations()) > 1 and len(equationsBlock.get_shapes()) == 0:
                 code, message = Messages.getNeuronSolvedBySolver(_neuron.getName())
                 Logger.logMessage(_neuron=_neuron, _code=code, _message=message,
                                   _errorPosition=_neuron.getSourcePosition(), _logLevel=LOGGING_LEVEL.INFO)
