@@ -351,7 +351,7 @@ class ASTUtils(object):
         return ret
 
     @classmethod
-    def getTupleFromSingleDictEntry(cls, _dictEntry=None):
+    def getTupleFromSingleDictEntry(cls, _dictEntry):
         """
         For a given dict of length 1, this method returns a tuple consisting of (key,value)
         :param _dictEntry: a dict of length 1

@@ -152,7 +152,7 @@ class ASTNeuron(ASTElement):
         else:
             return ret
 
-    def getInitialBlocks(self):
+    def get_initial_blocks(self):
         """
         Returns a list of all initial blocks defined in this body.
         :return: a list of initial-blocks.
@@ -235,7 +235,7 @@ class ASTNeuron(ASTElement):
         :return: a list of initial values declarations
         :rtype: list(ASTDeclaration)
         """
-        initialValuesBlock = self.getInitialBlocks()
+        initialValuesBlock = self.get_initial_blocks()
         initialValuesDeclarations = list()
         if initialValuesBlock is not None:
             for decl in initialValuesBlock.getDeclarations():
@@ -613,9 +613,9 @@ class ASTNeuron(ASTElement):
         :type _declaration: ASTDeclaration
         """
         from pynestml.utils.ASTCreator import ASTCreator
-        if self.getInitialBlocks() is None:
+        if self.get_initial_blocks() is None:
             ASTCreator.createInitialValuesBlock(self)
-        self.getInitialBlocks().getDeclarations().append(_declaration)
+        self.get_initial_blocks().getDeclarations().append(_declaration)
         return
 
     """

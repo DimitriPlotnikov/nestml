@@ -17,14 +17,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from copy import deepcopy
+import re
+
+from odetoolbox import analysis
 
 from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
 from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
-from pynestml.modelprocessor.ASTOdeEquation import ASTOdeEquation
-from pynestml.modelprocessor.ASTOdeFunction import ASTOdeFunction
-from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.utils.OdeTransformer import OdeTransformer
+
+variable_matching_template = r'(\b)({})(\b)'
 
 
 def transform_ode_and_shapes_to_json(equations_block):
@@ -69,16 +70,16 @@ def transform_functions_json(equations_block):
     return result
 
 
-def prepare_functions(functions):
+def make_definitions_self_contained(functions):
     """
     Make function definition self contained, e.g. without any references to functions from `functions`.
     :param functions: A sorted list with entries {"symbol": "name", "definition": "expression"}.
     :return: A list with entries {"symbol": "name", "definition": "expression"}. Expressions don't depend on each other.
     """
-    functions = deepcopy(functions)
     for source in functions:
         for target in functions:
-            target["definition"] = target["definition"].replace(source["symbol"], source["definition"])
+            matcher = re.compile(variable_matching_template.format(source["symbol"]))
+            target["definition"] = re.sub(matcher, "(" + source["definition"] + ")", target["definition"])
     return functions
 
 
@@ -91,92 +92,20 @@ def refactor(definitions, functions):
     must be replaced in `definitions`.
     :return: A list with definitions. Expressions in `definitions` don't depend on functions from `functions`.
     """
-    definitions = deepcopy(definitions)
     for fun in functions:
-        for definition in definitions:
-            definition["definition"] = definition["definition"].replace(fun["symbol"], fun["definition"])
+        for target in definitions:
+            matcher = re.compile(variable_matching_template.format(fun["symbol"]))
+            target["definition"] = re.sub(matcher, "(" + fun["definition"] + ")", target["definition"])
     return definitions
 
 
-class SolverInput(object):
-    """
-    Captures the ODE block for the processing in the SymPy. Generates corresponding json representation.
-    """
-    __shapes = []
-    __odes = []
-    __printer = None
+def solve_ode_with_shapes(equations_block):
+    # type: (ASTEquationsBlock) -> dict[str, list]
+    odes_shapes_json = transform_ode_and_shapes_to_json(equations_block)
+    functions_json = transform_functions_json(equations_block)
+    functions_json = make_definitions_self_contained(functions_json)
 
-    def __init__(self):
-        """
-        Standard constructor.
-        """
-        self.__printer = ExpressionsPrettyPrinter()
-        return
+    odes_shapes_json["shapes"] = refactor(odes_shapes_json["shapes"], functions_json)
+    odes_shapes_json["odes"] = refactor(odes_shapes_json["odes"], functions_json)
 
-    def from_ode_with_shapes(self, _equations_block):
-        """
-        Standard constructor providing the basic functionality to transform equation blocks to json format.
-        :param _equations_block: a single equation block.
-        :type _equations_block: ASTEquationsBlock
-        """
-        assert (isinstance(_equations_block, ASTEquationsBlock)), \
-            '(PyNestML.Solver.Input) Wrong type of equations block provided (%s)!' % _equations_block
-        working_copy = deepcopy(_equations_block)
-        working_copy = OdeTransformer.refactor_convolve_call(working_copy)
-        self.__ode = self.print_equation(working_copy.get_equations()[0])
-        self.__functions = list()
-
-        self.__shapes = list()
-        for shape in working_copy.get_shapes():
-            self.__shapes.append(self.print_shape(shape))
-        return self
-
-    def from_shapes(self, _shapes):
-        """
-        The same functionality as in the case of from_ode_with_shapes, but now only shapes are solved
-        :param _shapes: a list of shapes
-        :type _shapes: list(ASTOdeShape)
-        """
-        self.__shapes = list()
-        for shape in _shapes:
-            self.__shapes.append(self.print_shape(shape))
-        self.__ode = None
-        self.__functions = list()
-        return self
-
-    def print_equation(self, _equation):
-        """
-        Prints an equation to a processable format.
-        :param _equation: a single equation
-        :type _equation: ASTOdeEquation
-        :return: the corresponding string representation
-        :rtype: str
-        """
-        assert (_equation is not None and isinstance(_equation, ASTOdeEquation)), \
-            '(PyNestML.Solver.Input) No or wrong type of equation provided (%s)!' % type(_equation)
-        return _equation.getLhs().getCompleteName() + ' = ' + self.__printer.printExpression(_equation.getRhs())
-
-    def print_shape(self, _shape=None):
-        """
-        Prints a single shape to a processable format.
-        :param _shape: a single shape
-        :type _shape: ASTOdeShape
-        :return: the corresponding string representation
-        :rtype: str
-        """
-        assert (_shape is not None and isinstance(_shape, ASTOdeShape)), \
-            '(PyNestML.Solver.Input) No or wrong type of shape provided (%s)!' % type(_shape)
-        return _shape.getVariable().getCompleteName() + ' = ' \
-               + self.__printer.printExpression(_shape.getExpression())
-
-    def print_function(self, _function=None):
-        """
-        Prints a single function to a processable format.
-        :param _function: a single function
-        :type _function: ASTOdeFunction
-        :return: the corresponding string representation
-        :rtype: str
-        """
-        assert (_function is not None and isinstance(_function, ASTOdeFunction)), \
-            '(PyNestML.Solver.Input) No or wrong type of function provided (%s)!' % type(_function)
-        return _function.getVariableName() + ' = ' + self.__printer.printExpression(_function.getExpression())
+    return analysis(odes_shapes_json)

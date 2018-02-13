@@ -44,8 +44,8 @@ class ASTExpressionCollectorVisitor(object):
         ret = list()
         if _neuron.getStateBlocks() is not None:
             ret.extend(cls.collectExpressionsInStateBlock(_neuron.getStateBlocks()))
-        if _neuron.getInitialBlocks() is not None:
-            ret.extend(cls.collectExpressionsInInitialBlock(_neuron.getInitialBlocks()))
+        if _neuron.get_initial_blocks() is not None:
+            ret.extend(cls.collectExpressionsInInitialBlock(_neuron.get_initial_blocks()))
         if _neuron.getInputBlocks() is not None:
             ret.extend(cls.collectExpressionsInInternalsBlock(_neuron.getInternalsBlocks()))
         if _neuron.getParameterBlocks():

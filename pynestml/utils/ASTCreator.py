@@ -72,7 +72,7 @@ class ASTCreator(object):
         :rtype: ASTNeuron
         """
         from pynestml.modelprocessor.ASTBlockWithVariables import ASTBlockWithVariables
-        if _neuron.getInitialBlocks() is None:
+        if _neuron.get_initial_blocks() is None:
             state = ASTBlockWithVariables.makeASTBlockWithVariables(_isState=False, _isParameters=False,
                                                                     _isInternals=False, _isInitialValues=True,
                                                                     _declarations=list(), _sourcePosition=

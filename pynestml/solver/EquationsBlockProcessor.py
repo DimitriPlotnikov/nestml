@@ -22,7 +22,7 @@ from pynestml.solver.SymPySolver import SymPySolver
 from pynestml.solver.DeltaSolutionTransformer import DeltaSolutionTransformer
 from pynestml.solver.ShapesToOdesTransformer import ShapesToOdesTransformer
 from pynestml.solver.TransformerBase import TransformerBase
-from pynestml.solver.ExactSolutionTransformer import ExactSolutionTransformer
+from pynestml.solver.solution_transformers import ExactSolutionTransformer
 from pynestml.utils.Messages import Messages
 from pynestml.utils.Logger import LOGGING_LEVEL, Logger
 from copy import deepcopy

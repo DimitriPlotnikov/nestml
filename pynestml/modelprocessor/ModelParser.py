@@ -70,7 +70,7 @@ class ModelParser(object):
         return ast
 
     @classmethod
-    def parseExpression(cls, _expression):
+    def parse_expression(cls, _expression):
         """
         Parses a single expression and returns the corresponding ast.
         :param _expression: a single expression.
