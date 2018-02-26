@@ -20,8 +20,7 @@
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.solver.TransformerBase import add_declarations_to_internals, \
     compute_state_shape_variables_declarations, add_declarations_to_initial_values, \
-    compute_state_shape_variables_updates, replaceIntegrateCallThroughPropagation, add_declaration_to_update_block, \
-    add_assignment_to_update_block
+    compute_state_shape_variables_updates, replace_integrate_call, add_state_updates
 from pynestml.utils.ASTCreator import ASTCreator
 
 
@@ -41,37 +40,18 @@ def integrate_exact_solution(neuron, exact_solution):
     state_shape_variables_updates = compute_state_shape_variables_updates(exact_solution)
 
     neuron = add_state_updates(state_shape_variables_updates, neuron)
-    print(neuron)
-    neuron = replaceIntegrateCallThroughPropagation(neuron, exact_solution.const_input,
-                                                                            exact_solution.ode_var_update_instructions)
 
-    for variable in stateShapeVariablesWithInitialValues:
-        neuron.addToStateBlock(ASTCreator.createDeclaration(variable[0] + ' real'))
+    neuron = replace_integrate_call(neuron, exact_solution)
 
     # copy initial block variables to the state block, since they are not backed through an ODE.
     for decl in neuron.getInitialValuesDeclarations():
         neuron.addToStateBlock(decl)
     # get rid of the ODE specification since the model is solved exactly and all ODEs are removed.
     if neuron.get_initial_blocks() is not None:
-        neuron.get_initial_blocks().clear()
+        neuron.remove_initial_blocks()
+
     if neuron.get_equations_blocks() is not None:
-        neuron.get_equations_blocks().clear()
+        neuron.remove_equations_blocks()
+
     return neuron
 
-
-def add_state_updates(state_shape_variables_updates, neuron):
-    # type: (map[str, str], ASTNeuron) -> ASTNeuron
-    """
-    Adds all update instructions as contained in the solver output to the update block of the neuron.
-    :param state_shape_variables_updates: map of variables to corresponding updates during the update step.
-    :param neuron: a single neuron
-    :return: a modified version of the neuron
-    """
-
-    for variable in state_shape_variables_updates:
-        declaration_statement = variable + '__tmp real = ' + state_shape_variables_updates[variable]
-        add_declaration_to_update_block(ASTCreator.createDeclaration(declaration_statement), neuron)
-
-    for variable in state_shape_variables_updates:
-        add_assignment_to_update_block(ASTCreator.createAssignment(variable + ' = ' + variable + '__tmp'), neuron)
-    return neuron

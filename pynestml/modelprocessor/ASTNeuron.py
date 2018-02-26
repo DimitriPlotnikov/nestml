@@ -20,6 +20,7 @@
 
 
 from pynestml.modelprocessor.ASTBody import ASTBody
+from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
 from pynestml.modelprocessor.VariableSymbol import VariableSymbol
 from pynestml.modelprocessor.ASTNode import ASTElement
 from pynestml.utils.Logger import LOGGING_LEVEL, Logger
@@ -170,6 +171,15 @@ class ASTNeuron(ASTElement):
         else:
             return ret
 
+    def remove_initial_blocks(self):
+        """
+        Remove all equations blocks
+        """
+        from pynestml.modelprocessor.ASTBlockWithVariables import ASTBlockWithVariables
+        for elem in self.getBody().getBodyElements():
+            if isinstance(elem, ASTBlockWithVariables) and elem.isInitialValues():
+                self.getBody().getBodyElements().remove(elem)
+
     def getParameterBlocks(self):
         """
         Returns a list of all parameter blocks defined in this body.
@@ -223,11 +233,20 @@ class ASTNeuron(ASTElement):
         :rtype: list(ASTEquationsBlock)
         """
         ret = list()
-        from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
         for elem in self.getBody().getBodyElements():
             if isinstance(elem, ASTEquationsBlock):
                 ret.append(elem)
         return ret
+
+    def remove_equations_blocks(self):
+        # type: (...) -> None
+        """
+        Deletes all quations blocks
+        """
+
+        for elem in self.getBody().getBodyElements():
+            if isinstance(elem, ASTEquationsBlock):
+                self.getBody().getBodyElements().remove(elem)
 
     def getInitialValuesDeclarations(self):
         """
@@ -727,3 +746,4 @@ class ASTNeuron(ASTElement):
         if not isinstance(_other, ASTNeuron):
             return False
         return self.getName() == _other.getName() and self.getBody().equals(_other.getBody())
+

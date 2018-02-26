@@ -1,5 +1,4 @@
 import json
-from copy import deepcopy
 from unittest import TestCase
 
 from pynestml.modelprocessor.ModelParser import ModelParser
@@ -8,7 +7,7 @@ from pynestml.solver.sympy_connector import solve_ode_with_shapes
 from tests.nestml_models_paths import iaf_psc_alpha_path
 
 
-class SolverConnectorTest(TestCase):
+class SolutionTransformerTest(TestCase):
 
     def test_exact_solution_integration(self):
         compilation_unit = ModelParser.parse_file_and_build_symboltable(iaf_psc_alpha_path)
@@ -22,4 +21,5 @@ class SolverConnectorTest(TestCase):
         print(json.dumps(exact_solution, indent=4, sort_keys=True))
 
         integrate_exact_solution(ast_neuron, exact_solution)
-        self.assertTrue(ast_neuron.get_equations_block() is None)
+        print(ast_neuron)
+        self.assertTrue(len(ast_neuron.get_equations_blocks()) == 0)

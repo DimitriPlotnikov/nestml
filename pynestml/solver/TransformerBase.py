@@ -20,8 +20,9 @@
 import re as re
 
 from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
-from pynestml.modelprocessor import ASTDeclaration
+from pynestml.modelprocessor import ASTDeclaration, PredefinedFunctions
 from pynestml.modelprocessor.ASTSmallStmt import ASTSmallStmt
+from pynestml.modelprocessor.ASTBlock import ASTBlock
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.ModelParser import ModelParser
@@ -155,50 +156,35 @@ def compute_state_shape_variables_updates(solver_output):
     return state_shape_updates
 
 
-def replaceIntegrateCallThroughPropagation(_neuron=None, _constInput=None, _propagatorSteps=None):
+def replace_integrate_call(neuron, solver_output):
+    # type: (...) -> ASTNeuron
     """
-    Replaces all intergrate calls to the corresponding references to propagation.
-    :param _neuron: a single neuron instance
-    :type _neuron: ASTNeuron
-    :param _constInput: an initial constant value
-    :type _constInput: tuple
-    :param _propagatorSteps: a list of propagator steps
-    :type _propagatorSteps: list(str)
-    :return: the modified neuron
-    :rtype: ASTNeuron
+    Replaces all integrate calls to the corresponding references to propagation.
+    :param neuron: a single neuron instance
+    :return: The neuron without an integrate calls. The function calls are replaced through an
+             incremental exact solution,
     """
-    from pynestml.modelprocessor.PredefinedFunctions import PredefinedFunctions
-    from pynestml.modelprocessor.ASTSmallStmt import ASTSmallStmt
-    from pynestml.modelprocessor.ASTBlock import ASTBlock
-    assert (_neuron is not None and isinstance(_neuron, ASTNeuron)), \
-        '(PyNestML.Solver.BaseTransformer) No or wrong type of neuron provided (%s)!' % type(_neuron)
-    assert (_propagatorSteps is not None and isinstance(_propagatorSteps, list)), \
-        '(PyNestML.Solver.BaseTransformer) No or wrong type of propagator steps provided (%s)!' % type(
-            _propagatorSteps)
-    integrateCall = ASTUtils.getFunctionCall(_neuron.getUpdateBlocks(), PredefinedFunctions.INTEGRATE_ODES)
+    integrate_call = ASTUtils.getFunctionCall(neuron.getUpdateBlocks(), PredefinedFunctions.INTEGRATE_ODES)
     # by construction of a valid neuron, only a single integrate call should be there
-    if isinstance(integrateCall, list):
-        integrateCall = integrateCall[0]
-    if integrateCall is not None:
-        smallStatement = _neuron.getParent(integrateCall)
-        assert (smallStatement is not None and isinstance(smallStatement, ASTSmallStmt))
+    if isinstance(integrate_call, list):
+        integrate_call = integrate_call[0]
+    if integrate_call is not None:
+        small_statement = neuron.getParent(integrate_call)
+        assert (small_statement is not None and isinstance(small_statement, ASTSmallStmt))
 
-        block = _neuron.getParent(smallStatement)
+        block = neuron.getParent(small_statement)
         assert (block is not None and isinstance(block, ASTBlock))
+
         for i in range(0, len(block.getStmts())):
-            if block.getStmts()[i].equals(smallStatement):
+            if block.getStmts()[i].equals(small_statement):
                 del block.getStmts()[i]
-                constTuple = ASTUtils.getTupleFromSingleDictEntry(_constInput)
-                updateStatements = list()
-                updateStatements.append(ASTCreator.createStatement(constTuple[0] + " real = " + constTuple[1]))
-                updateStatements += list((ASTCreator.createStatement(prop) for prop in _propagatorSteps))
-                block.getStmts()[i:i] = updateStatements
+                block.getStmts()[i:i] = list((ASTCreator.createStatement(prop) for prop in solver_output["ode_updates"]))
                 break
     else:
         code, message = Messages.getOdeSolutionNotUsed()
-        Logger.logMessage(_neuron=_neuron, _code=code, _message=message, _errorPosition=_neuron.getSourcePosition(),
+        Logger.logMessage(_neuron=neuron, _code=code, _message=message, _errorPosition=neuron.getSourcePosition(),
                           _logLevel=LOGGING_LEVEL.INFO)
-    return _neuron
+    return neuron
 
 
 def applyIncomingSpikes(_neuron=None):
@@ -253,4 +239,22 @@ def add_declaration_to_update_block(declaration, neuron):
     """
     small_stmt = ASTSmallStmt(_declaration=declaration, _sourcePosition=ASTSourcePosition.getAddedSourcePosition())
     neuron.getUpdateBlocks().getBlock().getStmts().append(small_stmt)
+    return neuron
+
+
+def add_state_updates(state_shape_variables_updates, neuron):
+    # type: (map[str, str], ASTNeuron) -> ASTNeuron
+    """
+    Adds all update instructions as contained in the solver output to the update block of the neuron.
+    :param state_shape_variables_updates: map of variables to corresponding updates during the update step.
+    :param neuron: a single neuron
+    :return: a modified version of the neuron
+    """
+
+    for variable in state_shape_variables_updates:
+        declaration_statement = variable + '__tmp real = ' + state_shape_variables_updates[variable]
+        add_declaration_to_update_block(ASTCreator.createDeclaration(declaration_statement), neuron)
+
+    for variable in state_shape_variables_updates:
+        add_assignment_to_update_block(ASTCreator.createAssignment(variable + ' = ' + variable + '__tmp'), neuron)
     return neuron
