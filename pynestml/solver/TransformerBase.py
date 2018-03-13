@@ -28,7 +28,8 @@ from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.utils.ASTCreator import ASTCreator
 from pynestml.utils.ASTUtils import ASTUtils
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.utils.OdeTransformer import OdeTransformer
 
@@ -182,8 +183,8 @@ def replace_integrate_call(neuron, solver_output):
                 break
     else:
         code, message = Messages.getOdeSolutionNotUsed()
-        Logger.logMessage(_neuron=neuron, _code=code, _message=message, _errorPosition=neuron.getSourcePosition(),
-                          _logLevel=LOGGING_LEVEL.INFO)
+        Logger.log_message(neuron=neuron, code=code, message=message, error_position=neuron.getSourcePosition(),
+                           log_level=LOGGING_LEVEL.INFO)
     return neuron
 
 
@@ -203,8 +204,8 @@ def applyIncomingSpikes(_neuron=None):
     for convCall in convCalls:
         shape = convCall.getArgs()[0].getVariable().getCompleteName()
         buffer = convCall.getArgs()[1].getVariable().getCompleteName()
-        initialValues = (_neuron.get_initial_blocks().getDeclarations()
-                         if _neuron.get_initial_blocks() is not None else list())
+        initialValues = (_neuron.get_initial_values_blocks().getDeclarations()
+                         if _neuron.get_initial_values_blocks() is not None else list())
         for astDeclaration in initialValues:
             for variable in astDeclaration.getVariables():
                 if re.match(shape + "[\']*", variable.getCompleteName()) or re.match(shape + '__[\\d]+$',

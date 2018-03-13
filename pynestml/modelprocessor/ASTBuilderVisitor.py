@@ -24,7 +24,8 @@ from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.ASTOutputBlock import SignalType
 from pynestml.modelprocessor.CoCosManager import CoCosManager
 from pynestml.modelprocessor.CommentCollectorVisitor import CommentCollectorVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 
 
 class ASTBuilderVisitor(ParseTreeVisitor):
@@ -629,8 +630,8 @@ class ASTBuilderVisitor(ParseTreeVisitor):
                 _isInternals=False, _isParameters=False, _isState=False, _isInitialValues=True,
                 _declarations=declarations, _sourcePosition=sourcePos)
         else:
-            Logger.logMessage('(NESTML.ASTBuilder) Unspecified type (=%s) of var-block.' % str(ctx.blockType),
-                              LOGGING_LEVEL.ERROR)
+            Logger.log_message('(NESTML.ASTBuilder) Unspecified type (=%s) of var-block.' % str(ctx.blockType),
+                               LOGGING_LEVEL.ERROR)
             return
         ret.setComment(self.__comments.visit(ctx))
         return ret

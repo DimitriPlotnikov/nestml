@@ -80,13 +80,20 @@ class ASTOdeEquation(ASTElement):
         """
         return self.__lhs
 
-    def getRhs(self):
+    def get_rhs(self):
         """
         Returns the left-hand side of the equation.
         :return: an object of the ast-expr class.
         :rtype: ASTExpression
         """
         return self.__rhs
+
+    def set_rhs(self, rhs):
+        # type: (rhs) -> None
+        """
+        Returns the left-hand side of the equation.
+        """
+        self.__rhs = rhs
 
     def getParent(self, _ast=None):
         """
@@ -100,10 +107,10 @@ class ASTOdeEquation(ASTElement):
             return self
         elif self.getLhs().getParent(_ast) is not None:
             return self.getLhs().getParent(_ast)
-        if self.getRhs() is _ast:
+        if self.get_rhs() is _ast:
             return self
-        elif self.getRhs().getParent(_ast) is not None:
-            return self.getRhs().getParent(_ast)
+        elif self.get_rhs().getParent(_ast) is not None:
+            return self.get_rhs().getParent(_ast)
         return None
 
     def __str__(self):
@@ -112,7 +119,7 @@ class ASTOdeEquation(ASTElement):
         :return: a string representing the equation.
         :rtype: str
         """
-        return str(self.getLhs()) + '=' + str(self.getRhs())
+        return str(self.getLhs()) + '=' + str(self.get_rhs())
 
     def equals(self, _other=None):
         """
@@ -124,4 +131,4 @@ class ASTOdeEquation(ASTElement):
         """
         if not isinstance(_other, ASTOdeEquation):
             return False
-        return self.getLhs().equals(_other.getLhs()) and self.getRhs().equals(_other.getRhs())
+        return self.getLhs().equals(_other.getLhs()) and self.get_rhs().equals(_other.get_rhs())

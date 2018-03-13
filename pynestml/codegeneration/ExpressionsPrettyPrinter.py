@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.modelprocessor.ASTSimpleExpression import ASTSimpleExpression
 from pynestml.modelprocessor.ASTExpression import ASTExpression
@@ -122,7 +123,7 @@ class ExpressionsPrettyPrinter(object):
                 ifNot = self.printExpression(_expr.getIfNot())
                 return self.__referenceConverter.convertTernaryOperator() % (condition, ifTrue, ifNot)
         else:
-            Logger.logMessage('Unsupported expression in expression pretty printer!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Unsupported expression in expression pretty printer!', LOGGING_LEVEL.ERROR)
             return ''
 
     def printFunctionCall(self, _functionCall):

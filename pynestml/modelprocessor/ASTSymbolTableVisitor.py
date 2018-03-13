@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.Scope import Scope, ScopeType
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.modelprocessor.FunctionSymbol import FunctionSymbol
 from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes
@@ -52,8 +53,8 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
         """
         Logger.setCurrentNeuron(_astNeuron)
         code, message = Messages.getStartBuildingSymbolTable()
-        Logger.logMessage(_neuron=_astNeuron, _code=code, _errorPosition=_astNeuron.getSourcePosition(),
-                          _message=message, _logLevel=LOGGING_LEVEL.INFO)
+        Logger.log_message(neuron=_astNeuron, code=code, error_position=_astNeuron.getSourcePosition(),
+                           message=message, log_level=LOGGING_LEVEL.INFO)
         ASTSymbolTableVisitor.visitNeuron(_astNeuron)
         Logger.setCurrentNeuron(None)
         return
@@ -709,8 +710,8 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
             '(PyNestML.SymbolTable.Visitor) No or wrong type of ode-equation provided (%s)!' % type(_equation)
         _equation.getLhs().updateScope(_equation.getScope())
         cls.visitVariable(_equation.getLhs())
-        _equation.getRhs().updateScope(_equation.getScope())
-        cls.visitExpression(_equation.getRhs())
+        _equation.get_rhs().updateScope(_equation.getScope())
+        cls.visitExpression(_equation.get_rhs())
         return
 
     @classmethod
@@ -801,8 +802,8 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
             typeSymbol = _line.getDatatype().getTypeSymbol()
         elif _line.isSpike():
             code, message = Messages.getBufferTypeNotDefined(_line.getName())
-            Logger.logMessage(_code=code, _message=message, _errorPosition=_line.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.WARNING)
+            Logger.log_message(code=code, message=message, error_position=_line.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.WARNING)
             typeSymbol = PredefinedTypes.getTypeIfExists('nS')
         else:
             typeSymbol = PredefinedTypes.getTypeIfExists('pA')
@@ -978,14 +979,14 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
         existingSymbol = _odeEquation.getScope().resolveToSymbol(_odeEquation.getLhs().getName() + '\'' * diffOrder,
                                                            SymbolKind.VARIABLE)
         if existingSymbol is not None:
-            existingSymbol.setOdeDefinition(_odeEquation.getRhs())
+            existingSymbol.setOdeDefinition(_odeEquation.get_rhs())
             code, message = Messages.getOdeUpdated(_odeEquation.getLhs().getNameOfLhs())
-            Logger.logMessage(_errorPosition=existingSymbol.getReferencedObject().getSourcePosition(),
-                              _code=code, _message=message, _logLevel=LOGGING_LEVEL.INFO)
+            Logger.log_message(neuron=None, error_position=existingSymbol.getReferencedObject().getSourcePosition(),
+                               code=code, message=message, log_level=LOGGING_LEVEL.INFO)
         else:
             code, message = Messages.getNoVariableFound(_odeEquation.getLhs().getNameOfLhs())
-            Logger.logMessage(_code=code, _message=message, _errorPosition=_odeEquation.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message, error_position=_odeEquation.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return
 
     @classmethod
@@ -1010,10 +1011,10 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
             existingSymbol.setOdeDefinition(_odeShape.getExpression())
             existingSymbol.setVariableType(VariableType.SHAPE)
             code, message = Messages.getOdeUpdated(_odeShape.getVariable().getNameOfLhs())
-            Logger.logMessage(_errorPosition=existingSymbol.getReferencedObject().getSourcePosition(),
-                              _code=code, _message=message, _logLevel=LOGGING_LEVEL.INFO)
+            Logger.log_message(error_position=existingSymbol.getReferencedObject().getSourcePosition(),
+                               code=code, message=message, log_level=LOGGING_LEVEL.INFO)
         else:
             code, message = Messages.getNoVariableFound(_odeShape.getVariable().getNameOfLhs())
-            Logger.logMessage(_code=code, _message=message, _errorPosition=_odeShape.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(code=code, message=message, error_position=_odeShape.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return

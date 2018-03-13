@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.modelprocessor.ASTSimpleExpression import ASTSimpleExpression
 from pynestml.modelprocessor.ASTExpression import ASTExpression
 from pynestml.modelprocessor.ASTArithmeticOperator import ASTArithmeticOperator
@@ -132,5 +133,5 @@ class LegacyExpressionPrinter(ExpressionsPrettyPrinter):
                 ifNot = self.printExpression(_expr.getIfNot())
                 return '(' + condition + ')?(' + ifTrue + '):(' + ifNot + ')'
         else:
-            Logger.logMessage('Unsupported expression in expression pretty printer!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Unsupported expression in expression pretty printer!', LOGGING_LEVEL.ERROR)
             return ''

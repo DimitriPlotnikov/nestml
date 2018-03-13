@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -67,11 +68,11 @@ class BufferDatatypeVisitor(NESTMLVisitor):
             '(PyNestML.CoCo.NoDatatypeOfCurrentBuffers) No or wrong type of input line provided (%s)!' % type(_line)
         if _line.isSpike() and not _line.hasDatatype():
             code, message = Messages.getDataTypeNotSpecified(_line.getName())
-            Logger.logMessage(_errorPosition=_line.getSourcePosition(), _logLevel=LOGGING_LEVEL.ERROR,
-                              _code=code, _message=message)
+            Logger.log_message(error_position=_line.getSourcePosition(), log_level=LOGGING_LEVEL.ERROR,
+                               code=code, message=message)
         if _line.isCurrent() and _line.hasDatatype():
             code, message = Messages.getNotTypeAllowed(_line.getName())
-            Logger.logMessage(_errorPosition=str(_line.getSourcePosition()),
-                              _code=code, _message=message,
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(error_position=str(_line.getSourcePosition()),
+                               code=code, message=message,
+                               log_level=LOGGING_LEVEL.ERROR)
         return

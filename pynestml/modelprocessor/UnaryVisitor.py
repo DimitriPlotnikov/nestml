@@ -27,7 +27,8 @@ from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
 from pynestml.modelprocessor.ASTExpression import ASTExpression
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 
 
 class UnaryVisitor(NESTMLVisitor):
@@ -62,7 +63,7 @@ class UnaryVisitor(NESTMLVisitor):
             else:
                 errorMsg = ErrorStrings.messageNonNumericType(self, termType.printSymbol(), _expr.getSourcePosition())
                 _expr.setTypeEither(Either.error(errorMsg))
-                Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+                Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
                 return
         elif unaryOp.isUnaryTilde():
             if termType.isInteger():
@@ -71,10 +72,10 @@ class UnaryVisitor(NESTMLVisitor):
             else:
                 errorMsg = ErrorStrings.messageNonNumericType(self, termType.printSymbol(), _expr.getSourcePosition())
                 _expr.setTypeEither(Either.error(errorMsg))
-                Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+                Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
                 return
         # Catch-all if no case has matched
         errorMsg = ErrorStrings.messageTypeError(self, str(_expr), _expr.getSourcePosition())
-        Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+        Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
         _expr.setTypeEither(Either.error(errorMsg))
         return

@@ -32,6 +32,7 @@ def integrate_exact_solution(neuron, exact_solution):
     :param exact_solution: exact solution
     :return: a modified neuron with integrated exact solution and without equationsblock
     """
+
     neuron.addToInternalBlock(ASTCreator.createDeclaration('__h ms = resolution()'))
     neuron = add_declarations_to_internals(neuron, exact_solution["propagator"])
 
@@ -40,15 +41,7 @@ def integrate_exact_solution(neuron, exact_solution):
     state_shape_variables_updates = compute_state_shape_variables_updates(exact_solution)
 
     neuron = add_state_updates(state_shape_variables_updates, neuron)
-
     neuron = replace_integrate_call(neuron, exact_solution)
-
-    # copy initial block variables to the state block, since they are not backed through an ODE.
-    for decl in neuron.getInitialValuesDeclarations():
-        neuron.addToStateBlock(decl)
-    # get rid of the ODE specification since the model is solved exactly and all ODEs are removed.
-    if neuron.get_initial_blocks() is not None:
-        neuron.remove_initial_blocks()
 
     if neuron.get_equations_blocks() is not None:
         neuron.remove_equations_blocks()

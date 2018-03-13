@@ -23,7 +23,8 @@ from __future__ import print_function
 import unittest
 import os
 from pynestml.modelprocessor.ModelParser import ModelParser
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.modelprocessor.SymbolTable import SymbolTable
 from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes

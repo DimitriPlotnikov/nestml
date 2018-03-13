@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -64,6 +65,6 @@ class OrderOfEquationVisitor(NESTMLVisitor):
         """
         if _equation.getLhs().getDifferentialOrder() == 0:
             code, message = Messages.getOrderNotDeclared(_equation.getLhs().getName())
-            Logger.logMessage(_errorPosition=_equation.getSourcePosition(), _code=code,
-                              _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(error_position=_equation.getSourcePosition(), code=code,
+                               message=message, log_level=LOGGING_LEVEL.ERROR)
         return

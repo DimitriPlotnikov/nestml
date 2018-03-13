@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -59,6 +60,6 @@ class CurrentTypeSpecifiedVisitor(NESTMLVisitor):
         if _line.isCurrent() and _line.hasInputTypes() and len(_line.getInputTypes()) > 0:
             code, message = Messages.getCurrentBufferSpecified(_line.getName(),
                                                                list((str(buf) for buf in _line.getInputTypes())))
-            Logger.logMessage(_errorPosition=_line.getSourcePosition(),
-                              _code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(error_position=_line.getSourcePosition(),
+                               code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
         return

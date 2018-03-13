@@ -20,7 +20,8 @@
 from astropy.units.core import CompositeUnit
 from astropy.units.quantity import Quantity
 from pynestml.modelprocessor.TypeSymbol import TypeSymbol
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.modelprocessor.UnitType import UnitType
 from copy import copy
 
@@ -245,7 +246,7 @@ class PredefinedTypes(object):
         if not _symbol.isPrimitive() and _symbol.getUnit().getName() not in cls.__name2type.keys():
             cls.__name2type[_symbol.getUnit().getName()] = _symbol
             code, message = Messages.getNewTypeRegistered(_symbol.getUnit().getName())
-            Logger.logMessage(_code=code, _message=message, _logLevel=LOGGING_LEVEL.INFO)
+            Logger.log_message(None, code, message, None, LOGGING_LEVEL.INFO)
         return
 
     @classmethod

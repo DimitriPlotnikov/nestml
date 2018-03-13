@@ -76,7 +76,7 @@ class ParametersAssignmentVisitor(NESTMLVisitor):
         if symbol is not None and symbol.getBlockType() == BlockType.PARAMETERS and \
                         _assignment.getScope().getScopeType() != ScopeType.GLOBAL:
             code, message = Messages.getAssignmentNotAllowed(_assignment.getVariable().getCompleteName())
-            Logger.logMessage(_errorPosition=_assignment.getSourcePosition(),
-                              _code=code, _message=message,
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(error_position=_assignment.getSourcePosition(),
+                               code=code, message=message,
+                               log_level=LOGGING_LEVEL.ERROR)
         return

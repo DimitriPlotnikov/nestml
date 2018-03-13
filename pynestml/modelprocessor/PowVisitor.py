@@ -27,7 +27,8 @@ from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes
 from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 
 
 class PowVisitor(NESTMLVisitor):
@@ -67,7 +68,7 @@ class PowVisitor(NESTMLVisitor):
                 if not exponentType.isInteger():
                     errorMsg = ErrorStrings.messageUnitBase(self, _expr.getSourcePosition())
                     _expr.setTypeEither(Either.error(errorMsg))
-                    Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+                    Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
                     return
                 baseUnit = baseType.getEncapsulatedUnit()
                 # TODO the following part is broken @ptraeder?
@@ -80,7 +81,7 @@ class PowVisitor(NESTMLVisitor):
                 else:
                     errorMsg = exponentValue.getError()
                     _expr.setTypeEither(Either.error(errorMsg))
-                    Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+                    Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
                     return
             else:
                 _expr.setTypeEither(Either.value(PredefinedTypes.getRealType()))
@@ -88,7 +89,7 @@ class PowVisitor(NESTMLVisitor):
         # Catch-all if no case has matched
         errorMsg = ErrorStrings.messageUnitBase(self, _expr.getSourcePosition())
         _expr.setTypeEither(Either.error(errorMsg))
-        Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+        Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
 
     def calculateNumericValue(self, _expr=None):
         """

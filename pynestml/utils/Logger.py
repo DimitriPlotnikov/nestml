@@ -17,8 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
-from enum import Enum
 from collections import OrderedDict
 import json
 
@@ -51,7 +51,7 @@ class Logger(object):
         """
         Initializes the logger.
         :param _loggingLevel: the logging level as required
-        :type _loggingLevel: LOGGING_LEVEL
+        :type _loggingLevel: pynestml.utils.LoggingLevel.LOGGING_LEVEL
         """
         assert (_loggingLevel is not None and isinstance(_loggingLevel, LOGGING_LEVEL)), \
             '(PyNestML.Logger) No or wrong type of logging-level provided (%s)!' % type(_loggingLevel)
@@ -70,49 +70,32 @@ class Logger(object):
         return cls.__log
 
     @classmethod
-    def logMessage(cls, _neuron=None, _code=None, _message=None, _errorPosition=None, _logLevel=None):
+    def log_message(cls,  neuron=None, code=None, message=None, error_position=None, log_level=None):
+        # type: (ASTNeuron|None, MessageCode, str, ASTSourcePosition|None, LOGGING_LEVEL) -> None
         """
         Logs the handed over message on the handed over. If the current logging is appropriate, the 
         message is also printed.
-        :param _neuron: the neuron in which the error occurred
-        :type _neuron: ASTNeuron
-        :param _code: a single error code
-        :type _code: ErrorCode
-        :param _errorPosition: the position on which the error occurred.
-        :type _errorPosition: SourcePosition
-        :param _message: a message.
-        :type _message: str
-        :param _logLevel: the corresponding log level.
-        :type _logLevel: LOGGING_LEVEL
+        :param neuron: the neuron in which the error occurred
+        :param code: a single error code
+        :param error_position: the position on which the error occurred.
+        :param message: a message.
+        :param log_level: the corresponding log level.
         """
         if cls.__currMessage is None:
             cls.initLogger(LOGGING_LEVEL.INFO)
-        from pynestml.modelprocessor.ASTNeuron import ASTNeuron
-        from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
-        assert (_message is not None and isinstance(_message, str)), \
-            '(PyNestML.Logger) No or wrong type of message provided (%s)!' % type(_message)
-        assert (_logLevel is not None and isinstance(_logLevel, LOGGING_LEVEL)), \
-            '(PyNestML.Logger) No or wrong type of logging-level provided (%s)!' % type(_logLevel)
-        assert (_neuron is None or isinstance(_neuron, ASTNeuron)), \
-            '(PyNestML.Logger) Wrong type of neuron provided (%s)!' % type(_neuron)
-        assert (_errorPosition is None or isinstance(_errorPosition, ASTSourcePosition)), \
-            '(PyNestML.Logger) Wrong type of error position provided (%s)!' % type(_errorPosition)
-        assert (_code is not None and isinstance(_code, MessageCode)), \
-            '(PyNestML.Logger) Wrong type of code provided (%s)!' % type(_code)
-        if isinstance(_neuron, ASTNeuron):
-            cls.__log[cls.__currMessage] = (
-                _neuron.getArtifactName(), _neuron, _logLevel, _code, _errorPosition, _message)
+        if neuron is not None:
+            cls.__log[cls.__currMessage] = (neuron.getArtifactName(), neuron, log_level, code, error_position, message)
         elif cls.__currentNeuron is not None:
             cls.__log[cls.__currMessage] = (cls.__currentNeuron.getArtifactName(), cls.__currentNeuron,
-                                            _logLevel, _code, _errorPosition, _message)
+                                            log_level, code, error_position, message)
         cls.__currMessage += 1
-        if cls.__loggingLevel.value <= _logLevel.value:
+        if cls.__loggingLevel.value <= log_level.value:
             print('[' + str(cls.__currMessage) + ','
-                  + (_neuron.getName() + ', ' if _neuron is not None else
+                  + (neuron.getName() + ', ' if neuron is not None else
                      cls.__currentNeuron.getName() + ', ' if cls.__currentNeuron is not None else 'GLOBAL, ')
-                  + str(_logLevel.name) + ', ' + str(_code.name) +
-                  (', ' + str(_errorPosition) if _errorPosition is not None else '') + ']:'
-                  + str(_message))
+                  + str(log_level.name) + ', ' + str(code.name) +
+                  (', ' + str(error_position) if error_position is not None else '') + ']:'
+                  + str(message))
         return
 
     @classmethod
@@ -239,11 +222,3 @@ class Logger(object):
         return json.dumps(parsed, indent=2, sort_keys=False)
 
 
-class LOGGING_LEVEL(Enum):
-    """
-    Different types of logging levels, this part can be extended.
-    """
-    INFO = 0
-    WARNING = 1
-    ERROR = 2
-    NO = 3

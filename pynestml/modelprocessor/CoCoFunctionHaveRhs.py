@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -55,6 +56,6 @@ class FunctionRhsVisitor(NESTMLVisitor):
         """
         if _declaration.isFunction() and not _declaration.hasExpression():
             code, message = Messages.getNoRhs(_declaration.getVariables()[0].getName())
-            Logger.logMessage(_errorPosition=_declaration.getSourcePosition(), _logLevel=LOGGING_LEVEL.ERROR,
-                              _code=code, _message=message)
+            Logger.log_message(error_position=_declaration.getSourcePosition(), log_level=LOGGING_LEVEL.ERROR,
+                               code=code, message=message)
         return

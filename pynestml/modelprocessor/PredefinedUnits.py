@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from pynestml.modelprocessor.UnitType import UnitType
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from astropy import units as u
 
 
@@ -108,7 +109,7 @@ class PredefinedUnits(object):
         else:
             from pynestml.utils.Messages import Messages
             code, message = Messages.getUnitDoesNotExist(_name)
-            Logger.logMessage(_code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
             return None
 
     @classmethod

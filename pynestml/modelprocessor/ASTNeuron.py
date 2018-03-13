@@ -23,7 +23,8 @@ from pynestml.modelprocessor.ASTBody import ASTBody
 from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
 from pynestml.modelprocessor.VariableSymbol import VariableSymbol
 from pynestml.modelprocessor.ASTNode import ASTElement
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -153,7 +154,7 @@ class ASTNeuron(ASTElement):
         else:
             return ret
 
-    def get_initial_blocks(self):
+    def get_initial_values_blocks(self):
         """
         Returns a list of all initial blocks defined in this body.
         :return: a list of initial-blocks.
@@ -170,6 +171,7 @@ class ASTNeuron(ASTElement):
             return None
         else:
             return ret
+
 
     def remove_initial_blocks(self):
         """
@@ -223,8 +225,7 @@ class ASTNeuron(ASTElement):
         :rtype: list(ASTEquationsBlock)
         """
         blocks = self.get_equations_blocks()
-        assert len(blocks) == 1
-        return blocks[0]
+        return blocks[0] if len(blocks) == 1 else None
 
     def get_equations_blocks(self):
         """
@@ -247,19 +248,6 @@ class ASTNeuron(ASTElement):
         for elem in self.getBody().getBodyElements():
             if isinstance(elem, ASTEquationsBlock):
                 self.getBody().getBodyElements().remove(elem)
-
-    def getInitialValuesDeclarations(self):
-        """
-        Returns a list of initial values declarations made in this neuron.
-        :return: a list of initial values declarations
-        :rtype: list(ASTDeclaration)
-        """
-        initialValuesBlock = self.get_initial_blocks()
-        initialValuesDeclarations = list()
-        if initialValuesBlock is not None:
-            for decl in initialValuesBlock.getDeclarations():
-                initialValuesDeclarations.append(decl)
-        return initialValuesDeclarations
 
     def getEquations(self):
         """
@@ -452,11 +440,11 @@ class ASTNeuron(ASTElement):
                     ret.append(iBuffer)
                 else:
                     code, message = Messages.getCouldNotResolve(iBuffer.getSymbolName())
-                    Logger.logMessage(
-                        _message=message,
-                        _code=code,
-                        _errorPosition=iBuffer.getSourcePosition(),
-                        _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(
+                        message=message,
+                        code=code,
+                        error_position=iBuffer.getSourcePosition(),
+                        log_level=LOGGING_LEVEL.ERROR)
         return ret
 
     def getParameterNonAliasSymbols(self):
@@ -632,9 +620,9 @@ class ASTNeuron(ASTElement):
         :type _declaration: ASTDeclaration
         """
         from pynestml.utils.ASTCreator import ASTCreator
-        if self.get_initial_blocks() is None:
+        if self.get_initial_values_blocks() is None:
             ASTCreator.createInitialValuesBlock(self)
-        self.get_initial_blocks().getDeclarations().append(_declaration)
+        self.get_initial_values_blocks().getDeclarations().append(_declaration)
         return
 
     """

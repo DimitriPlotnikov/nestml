@@ -26,7 +26,8 @@ from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
 from pynestml.modelprocessor.ASTExpression import ASTExpression
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 
 
 class BinaryLogicVisitor(NESTMLVisitor):
@@ -57,5 +58,5 @@ class BinaryLogicVisitor(NESTMLVisitor):
         else:
             errorMsg = ErrorStrings.messageLogicOperandsNotBool(self, _expr.getSourcePosition())
             _expr.setTypeEither(Either.error(errorMsg))
-            Logger.logMessage(errorMsg, LOGGING_LEVEL.ERROR)
+            Logger.log_message(errorMsg, LOGGING_LEVEL.ERROR)
         return

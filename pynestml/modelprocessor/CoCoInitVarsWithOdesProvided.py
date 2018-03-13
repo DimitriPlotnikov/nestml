@@ -22,7 +22,8 @@ from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Symbol import SymbolKind
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -77,15 +78,15 @@ class InitVarsVisitor(NESTMLVisitor):
             # first check that all initial value variables have a lhs
             if symbol is not None and symbol.isInitValues() and not _declaration.hasExpression():
                 code, message = Messages.getNoRhs(symbol.getSymbolName())
-                Logger.logMessage(_errorPosition=var.getSourcePosition(), _code=code,
-                                  _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=var.getSourcePosition(), code=code,
+                                   message=message, log_level=LOGGING_LEVEL.ERROR)
             # now check that they have been provided with an ODE
             if symbol is not None and symbol.isInitValues() and not symbol.isOdeDefined() and not symbol.isFunction():
                 code, message = Messages.getNoOde(symbol.getSymbolName())
-                Logger.logMessage(_errorPosition=var.getSourcePosition(), _code=code,
-                                  _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=var.getSourcePosition(), code=code,
+                                   message=message, log_level=LOGGING_LEVEL.ERROR)
             if symbol is not None and symbol.isInitValues() and not symbol.hasInitialValue():
                 code, message = Messages.getNoInitValue(symbol.getSymbolName())
-                Logger.logMessage(_errorPosition=var.getSourcePosition(), _code=code,
-                                  _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=var.getSourcePosition(), code=code,
+                                   message=message, log_level=LOGGING_LEVEL.ERROR)
         return

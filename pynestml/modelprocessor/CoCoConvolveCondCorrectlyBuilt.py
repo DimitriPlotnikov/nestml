@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
@@ -64,11 +65,11 @@ class ConvolveCheckerVisitor(NESTMLVisitor):
                                                                     SymbolKind.VARIABLE)
             if symbolVar is not None and not symbolVar.isShape() and not symbolVar.isInitValues():
                 code, message = Messages.getFirstArgNotShapeOrEquation(funcName)
-                Logger.logMessage(_code=code, _message=message,
-                                  _errorPosition=_functionCall.getSourcePosition(), _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(code=code, message=message,
+                                   error_position=_functionCall.getSourcePosition(), log_level=LOGGING_LEVEL.ERROR)
             if symbolBuffer is not None and not symbolBuffer.isInputBufferSpike():
                 code, message = Messages.getSecondArgNotABuffer(funcName)
-                Logger.logMessage(_errorPosition=_functionCall.getSourcePosition(),
-                                  _code=code, _message=message,
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=_functionCall.getSourcePosition(),
+                                   code=code, message=message,
+                                   log_level=LOGGING_LEVEL.ERROR)
             return

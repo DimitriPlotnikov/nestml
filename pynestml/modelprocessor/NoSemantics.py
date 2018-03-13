@@ -24,7 +24,8 @@ Placeholder for expression productions that are not implemented
 from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
 
 
@@ -43,8 +44,8 @@ class NoSemantics(NESTMLVisitor):
         errorMsg = ErrorStrings.messageNoSemantics(self, str(_expr), _expr.getSourcePosition())
         _expr.setTypeEither(Either.error(errorMsg))
         # just warn though
-        Logger.logMessage(_message=errorMsg,
-                          _code=MessageCode.NO_SEMANTICS,
-                          _errorPosition=_expr.getSourcePosition(),
-                          _logLevel=LOGGING_LEVEL.WARNING)
+        Logger.log_message(message=errorMsg,
+                           code=MessageCode.NO_SEMANTICS,
+                           error_position=_expr.getSourcePosition(),
+                           log_level=LOGGING_LEVEL.WARNING)
         return

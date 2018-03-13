@@ -31,7 +31,8 @@ from pynestml.modelprocessor.PredefinedVariables import PredefinedVariables
 from pynestml.modelprocessor.SymbolTable import SymbolTable
 from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.CoCosManager import CoCosManager
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
 
 # minor setup steps required
@@ -62,14 +63,14 @@ class expressionTestVisitor(NESTMLVisitor):
             message += " Neuroscience Factor: " + \
             str(UnitConverter().getFactor(_expr.getTypeEither().getValue().getUnit().getUnit()))
 
-        Logger.logMessage(_errorPosition=_assignment.getSourcePosition(), _code=MessageCode.TYPE_MISMATCH,
-                          _message=message, _logLevel=LOGGING_LEVEL.INFO)
+        Logger.log_message(error_position=_assignment.getSourcePosition(), code=MessageCode.TYPE_MISMATCH,
+                           message=message, log_level=LOGGING_LEVEL.INFO)
 
         if _equals is False:
-            Logger.logMessage(_message="Type mismatch in test_building_symboltable_for_all_neurons!",
-                              _code=MessageCode.TYPE_MISMATCH,
-                              _errorPosition=_assignment.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(message="Type mismatch in test_building_symboltable_for_all_neurons!",
+                               code=MessageCode.TYPE_MISMATCH,
+                               error_position=_assignment.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return
 
 

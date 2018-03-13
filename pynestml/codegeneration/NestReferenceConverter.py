@@ -27,7 +27,8 @@ from pynestml.modelprocessor.PredefinedVariables import PredefinedVariables
 from pynestml.modelprocessor.Symbol import SymbolKind
 from pynestml.modelprocessor.PredefinedUnits import PredefinedUnits
 from pynestml.codegeneration.UnitConverter import UnitConverter
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.utils.ASTUtils import ASTUtils
 
@@ -73,7 +74,7 @@ class NESTReferenceConverter(IReferenceConverter):
         if isinstance(_binaryOperator, ASTLogicalOperator):
             return cls.convertLogicalOperator(_binaryOperator)
         else:
-            Logger.logMessage('Cannot determine binary operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine binary operator!', LOGGING_LEVEL.ERROR)
             return '(%s) ERROR (%s)'
 
     @classmethod
@@ -142,8 +143,8 @@ class NESTReferenceConverter(IReferenceConverter):
             if symbol is None:
                 # this should actually not happen, but an error message is better than an exception
                 code, message = Messages.getCouldNotResolve(variableName)
-                Logger.logMessage(_logLevel=LOGGING_LEVEL.ERROR, _code=code, _message=message,
-                                  _errorPosition=_astVariable.getSourcePosition())
+                Logger.log_message(log_level=LOGGING_LEVEL.ERROR, code=code, message=message,
+                                   error_position=_astVariable.getSourcePosition())
                 return ''
             else:
                 if symbol.isLocal():
@@ -199,7 +200,7 @@ class NESTReferenceConverter(IReferenceConverter):
         elif _unaryOperator.isUnaryTilde():
             return '(' + '~' + '%s' + ')'
         else:
-            Logger.logMessage('Cannot determine unary operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine unary operator!', LOGGING_LEVEL.ERROR)
             return '(' + '%s' + ')'
 
     @classmethod
@@ -238,7 +239,7 @@ class NESTReferenceConverter(IReferenceConverter):
         elif _op.isOr():
             return '%s' + '||' + '%s'
         else:
-            Logger.logMessage('Cannot determine logical operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine logical operator!', LOGGING_LEVEL.ERROR)
             return '(%s) ERROR  (%s)'
 
     @classmethod
@@ -267,7 +268,7 @@ class NESTReferenceConverter(IReferenceConverter):
         elif _op.isGt():
             return '%s' + '>' + '%s'
         else:
-            Logger.logMessage('Cannot determine comparison operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine comparison operator!', LOGGING_LEVEL.ERROR)
             return '(%s) ERROR  (%s)'
 
     @classmethod
@@ -294,7 +295,7 @@ class NESTReferenceConverter(IReferenceConverter):
         if _op.isBitXor():
             return '%s' + '^' + '%s'
         else:
-            Logger.logMessage('Cannot determine bit operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine bit operator!', LOGGING_LEVEL.ERROR)
             return '(%s) ERROR (%s)'
 
     @classmethod
@@ -323,7 +324,7 @@ class NESTReferenceConverter(IReferenceConverter):
         if _op.isPowOp():
             return 'pow' + '(%s,%s)'
         else:
-            Logger.logMessage('Cannot determine arithmetic operator!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('Cannot determine arithmetic operator!', LOGGING_LEVEL.ERROR)
             return '(%s) ERROR (%s)'
 
     @classmethod

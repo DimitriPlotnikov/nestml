@@ -21,7 +21,8 @@ from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Symbol import SymbolKind
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -72,7 +73,7 @@ class VectorInDeclarationVisitor(NESTMLVisitor):
                                                                                       var in
                                                                                       _declaration.getVariables()))
 
-                        Logger.logMessage(_errorPosition=_declaration.getSourcePosition(),
-                                          _code=code, _message=message,
-                                          _logLevel=LOGGING_LEVEL.ERROR)
+                        Logger.log_message(error_position=_declaration.getSourcePosition(),
+                                           code=code, message=message,
+                                           log_level=LOGGING_LEVEL.ERROR)
         return

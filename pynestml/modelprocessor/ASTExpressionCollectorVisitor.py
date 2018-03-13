@@ -44,8 +44,8 @@ class ASTExpressionCollectorVisitor(object):
         ret = list()
         if _neuron.getStateBlocks() is not None:
             ret.extend(cls.collectExpressionsInStateBlock(_neuron.getStateBlocks()))
-        if _neuron.get_initial_blocks() is not None:
-            ret.extend(cls.collectExpressionsInInitialBlock(_neuron.get_initial_blocks()))
+        if _neuron.get_initial_values_blocks() is not None:
+            ret.extend(cls.collectExpressionsInInitialBlock(_neuron.get_initial_values_blocks()))
         if _neuron.getInputBlocks() is not None:
             ret.extend(cls.collectExpressionsInInternalsBlock(_neuron.getInternalsBlocks()))
         if _neuron.getParameterBlocks():
@@ -212,7 +212,7 @@ class ASTExpressionCollectorVisitor(object):
                     elif isinstance(decl, ASTOdeShape):
                         ret.append(decl.getExpression())
                     elif isinstance(decl, ASTOdeEquation):
-                        ret.append(decl.getRhs())
+                        ret.append(decl.get_rhs())
         else:
             for decl in _block.getDeclarations():
                 if isinstance(decl, ASTOdeFunction):
@@ -220,7 +220,7 @@ class ASTExpressionCollectorVisitor(object):
                 elif isinstance(decl, ASTOdeShape):
                     ret.append(decl.getExpression())
                 elif isinstance(decl, ASTOdeEquation):
-                    ret.append(decl.getRhs())
+                    ret.append(decl.get_rhs())
         return ret
 
     @classmethod

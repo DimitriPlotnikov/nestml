@@ -27,7 +27,8 @@ from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
 from pynestml.modelprocessor.ASTExpression import ASTExpression
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
 
 
@@ -85,9 +86,9 @@ class LineOperatorVisitor(NESTMLVisitor):
                                                                   rhsType.printSymbol(), 'real',
                                                                   _expr.getSourcePosition())
                 _expr.setTypeEither(Either.value(PredefinedTypes.getRealType()))
-                Logger.logMessage(_code=MessageCode.ADD_SUB_TYPE_MISMATCH,
-                                  _errorPosition=_expr.getSourcePosition(),
-                                  _message=errorMsg, _logLevel=LOGGING_LEVEL.WARNING)
+                Logger.log_message(code=MessageCode.ADD_SUB_TYPE_MISMATCH,
+                                   error_position=_expr.getSourcePosition(),
+                                   message=errorMsg, log_level=LOGGING_LEVEL.WARNING)
                 return
             # one is unit and one numeric primitive and vice versa -> assume unit, WARN
             if (lhsType.isUnit() and rhsType.isNumericPrimitive()) or (
@@ -100,8 +101,8 @@ class LineOperatorVisitor(NESTMLVisitor):
                                                                   rhsType.printSymbol(), unitType.printSymbol(),
                                                                   _expr.getSourcePosition())
                 _expr.setTypeEither(Either.value(unitType))
-                Logger.logMessage(_code=MessageCode.ADD_SUB_TYPE_MISMATCH, _message=errorMsg,
-                                  _errorPosition=_expr.getSourcePosition(), _logLevel=LOGGING_LEVEL.WARNING)
+                Logger.log_message(code=MessageCode.ADD_SUB_TYPE_MISMATCH, message=errorMsg,
+                                   error_position=_expr.getSourcePosition(), log_level=LOGGING_LEVEL.WARNING)
                 return
 
         # if we get here, we are in a general error state
@@ -109,5 +110,5 @@ class LineOperatorVisitor(NESTMLVisitor):
                                                           rhsType.printSymbol(), 'ERROR',
                                                           _expr.getSourcePosition())
         _expr.setTypeEither(Either.error(errorMsg))
-        Logger.logMessage(_code=MessageCode.ADD_SUB_TYPE_MISMATCH, _message=errorMsg,
-                          _errorPosition=_expr.getSourcePosition(), _logLevel=LOGGING_LEVEL.ERROR)
+        Logger.log_message(code=MessageCode.ADD_SUB_TYPE_MISMATCH, message=errorMsg,
+                           error_position=_expr.getSourcePosition(), log_level=LOGGING_LEVEL.ERROR)

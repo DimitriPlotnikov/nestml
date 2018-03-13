@@ -22,7 +22,8 @@ import unittest
 
 from pynestml.modelprocessor.ASTNESTMLCompilationUnit import ASTNESTMLCompilationUnit
 from pynestml.modelprocessor.ModelParser import ModelParser
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 
 Logger.initLogger(LOGGING_LEVEL.INFO)
 

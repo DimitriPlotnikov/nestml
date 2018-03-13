@@ -21,7 +21,8 @@ from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.ASTSimpleExpression import ASTSimpleExpression
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -69,6 +70,6 @@ class SumIsCorrectVisitor(NESTMLVisitor):
             for arg in _functionCall.getArgs():
                 if not isinstance(arg, ASTSimpleExpression) or not arg.isVariable():
                     code, message = Messages.getNotAVariable(str(arg))
-                    Logger.logMessage(_code=code, _message=message,
-                                      _errorPosition=arg.getSourcePosition(), _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(code=code, message=message,
+                                       error_position=arg.getSourcePosition(), log_level=LOGGING_LEVEL.ERROR)
         return

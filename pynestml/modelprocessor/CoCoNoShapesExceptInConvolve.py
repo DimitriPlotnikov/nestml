@@ -23,7 +23,8 @@ from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ASTFunctionCall import ASTFunctionCall
 from pynestml.modelprocessor.Symbol import SymbolKind
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -100,9 +101,9 @@ class ShapeUsageVisitor(NESTMLVisitor):
                                         grandparentFuncName == 'convolve':
                             continue
                 code, message = Messages.getShapeOutsideConvolve(shapeName)
-                Logger.logMessage(_errorPosition=_variable.getSourcePosition(),
-                                  _code=code, _message=message,
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=_variable.getSourcePosition(),
+                                   code=code, message=message,
+                                   log_level=LOGGING_LEVEL.ERROR)
         return
 
 

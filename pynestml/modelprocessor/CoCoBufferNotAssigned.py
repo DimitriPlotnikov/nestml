@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
@@ -55,7 +56,7 @@ class NoBufferAssignedVisitor(NESTMLVisitor):
         if symbol is not None and (symbol.getBlockType() == BlockType.INPUT_BUFFER_SPIKE or
                                            symbol.getBlockType() == BlockType.INPUT_BUFFER_CURRENT):
             code, message = Messages.getValueAssignedToBuffer(_assignment.getVariable().getCompleteName())
-            Logger.logMessage(_code=code, _message=message,
-                              _errorPosition=_assignment.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(code=code, message=message,
+                               error_position=_assignment.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return

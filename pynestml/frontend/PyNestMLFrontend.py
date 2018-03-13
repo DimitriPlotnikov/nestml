@@ -21,12 +21,13 @@
 import os
 import sys
 
-from pynestml.codegeneration.NestCodeGenerator import NestCodeGenerator
+from pynestml.codegeneration.nest_codegeneration import NestCodeGenerator
 from pynestml.frontend.FrontendConfiguration import FrontendConfiguration
 from pynestml.modelprocessor.CoCosManager import CoCosManager
 from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.modelprocessor.ModelParserExceptions import InvalidPathException
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -54,17 +55,17 @@ def main(args):
         for neuron in neurons:
             if Logger.hasErrors(neuron):
                 code, message = Messages.getNeuronContainsErrors(neuron.getName())
-                Logger.logMessage(_neuron=neuron, _code=code, _message=message, _errorPosition=neuron.getSourcePosition(),
-                                  _logLevel=LOGGING_LEVEL.INFO)
+                Logger.log_message(neuron=neuron, code=code, message=message, error_position=neuron.getSourcePosition(),
+                                   log_level=LOGGING_LEVEL.INFO)
                 neurons.remove(neuron)
 
     if not FrontendConfiguration.isDryRun():
         nestGenerator = NestCodeGenerator()
-        nestGenerator.analyseAndGenerateNeurons(neurons)
-        nestGenerator.generateNESTModuleCode(neurons)
+        nestGenerator.analyse_and_generate_neurons(neurons)
+        nestGenerator.generate_nest_module_code(neurons)
     else:
         code, message = Messages.getDryRun()
-        Logger.logMessage(_neuron=None, _code=code, _message=message, _logLevel=LOGGING_LEVEL.INFO)
+        Logger.log_message(neuron=None, code=code, message=message, log_level=LOGGING_LEVEL.INFO)
     if FrontendConfiguration.storeLog():
         with open(str(os.path.join(FrontendConfiguration.getTargetPath(),
                                    'log')) + '.txt', 'w+') as f:

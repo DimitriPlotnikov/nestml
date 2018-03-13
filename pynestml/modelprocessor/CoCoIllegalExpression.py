@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.utils.Messages import Messages
 from pynestml.modelprocessor.CoCo import CoCo
@@ -60,9 +61,9 @@ class CorrectExpressionVisitor(NESTMLVisitor):
             rhsType = _declaration.getExpression().getTypeEither()
             if rhsType.isError():
                 code, message = Messages.getTypeCouldNotBeDerived(_declaration.getExpression())
-                Logger.logMessage(_neuron=None, _code=code, _message=message,
-                                  _errorPosition=_declaration.getExpression().getSourcePosition(),
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(neuron=None, code=code, message=message,
+                                   error_position=_declaration.getExpression().getSourcePosition(),
+                                   log_level=LOGGING_LEVEL.ERROR)
             elif not lhsType.equals(rhsType.getValue()):
                 if ASTUtils.differsInMagnitude(rhsType.getValue(),lhsType):
                     return
@@ -70,15 +71,15 @@ class CorrectExpressionVisitor(NESTMLVisitor):
                     code, message = Messages.getImplicitCastRhsToLhs(_declaration.getExpression(),
                                                                      _declaration.getVariables()[0],
                                                                      rhsType.getValue(), lhsType)
-                    Logger.logMessage(_errorPosition=_declaration.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.WARNING)
+                    Logger.log_message(error_position=_declaration.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.WARNING)
                 else:
                     code, message = Messages.getDifferentTypeRhsLhs(_rhsExpression=_declaration.getExpression(),
                                                                     _lhsExpression=_declaration.getVariables()[0],
                                                                     _rhsType=rhsType.getValue(),
                                                                     _lhsType=lhsType)
-                    Logger.logMessage(_errorPosition=_declaration.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(error_position=_declaration.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
         return
 
     def visitAssignment(self, _assignment=None):
@@ -95,9 +96,9 @@ class CorrectExpressionVisitor(NESTMLVisitor):
             rhsSymbolType = _assignment.getExpression().getTypeEither()
             if rhsSymbolType.isError():
                 code, message = Messages.getTypeCouldNotBeDerived(_assignment.getExpression())
-                Logger.logMessage(_neuron=None, _code=code, _message=message,
-                                  _errorPosition=_assignment.getExpression().getSourcePosition(),
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(neuron=None, code=code, message=message,
+                                   error_position=_assignment.getExpression().getSourcePosition(),
+                                   log_level=LOGGING_LEVEL.ERROR)
             elif lhsSymbolType is not None and not lhsSymbolType.getTypeSymbol().equals(rhsSymbolType.getValue()):
                 if ASTUtils.differsInMagnitude(rhsSymbolType.getValue(),lhsSymbolType.getTypeSymbol()):
                     return
@@ -106,15 +107,15 @@ class CorrectExpressionVisitor(NESTMLVisitor):
                                                                      _assignment.getVariable(),
                                                                      rhsSymbolType.getValue(),
                                                                      lhsSymbolType.getTypeSymbol())
-                    Logger.logMessage(_errorPosition=_assignment.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.WARNING)
+                    Logger.log_message(error_position=_assignment.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.WARNING)
                 else:
                     code, message = Messages.getDifferentTypeRhsLhs(_assignment.getExpression(),
                                                                     _assignment.getVariable(),
                                                                     rhsSymbolType.getValue(),
                                                                     lhsSymbolType.getTypeSymbol())
-                    Logger.logMessage(_errorPosition=_assignment.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(error_position=_assignment.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
         else:
             expr = ASTUtils.deconstructAssignment(_lhs=_assignment.getVariable(),
                                                   _isPlus=_assignment.isCompoundSum(),
@@ -127,9 +128,9 @@ class CorrectExpressionVisitor(NESTMLVisitor):
             rhsSymbolType = expr.getTypeEither()
             if rhsSymbolType.isError():
                 code, message = Messages.getTypeCouldNotBeDerived(_assignment.getExpression())
-                Logger.logMessage(_neuron=None, _code=code, _message=message,
-                                  _errorPosition=_assignment.getExpression().getSourcePosition(),
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(neuron=None, code=code, message=message,
+                                   error_position=_assignment.getExpression().getSourcePosition(),
+                                   log_level=LOGGING_LEVEL.ERROR)
             elif lhsSymbolType is not None and not lhsSymbolType.getTypeSymbol().equals(rhsSymbolType.getValue()):
                 if ASTUtils.differsInMagnitude(rhsSymbolType.getValue(), lhsSymbolType.getTypeSymbol()):
                     return
@@ -138,15 +139,15 @@ class CorrectExpressionVisitor(NESTMLVisitor):
                                                                      _assignment.getVariable(),
                                                                      rhsSymbolType.getValue(),
                                                                      lhsSymbolType.getTypeSymbol())
-                    Logger.logMessage(_errorPosition=_assignment.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.WARNING)
+                    Logger.log_message(error_position=_assignment.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.WARNING)
                 else:
                     code, message = Messages.getDifferentTypeRhsLhs(expr,
                                                                     _assignment.getVariable(),
                                                                     rhsSymbolType.getValue(),
                                                                     lhsSymbolType.getTypeSymbol())
-                    Logger.logMessage(_errorPosition=_assignment.getSourcePosition(),
-                                      _code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(error_position=_assignment.getSourcePosition(),
+                                       code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
         # todo we have to consider that different magnitudes can still be combined
         return
 
@@ -159,14 +160,14 @@ class CorrectExpressionVisitor(NESTMLVisitor):
         condType = _ifClause.getCondition().getTypeEither()
         if condType.isError():
             code, message = Messages.getTypeCouldNotBeDerived(_ifClause.getCondition())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_ifClause.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_ifClause.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         elif not condType.getValue().equals(PredefinedTypes.getBooleanType()):
             code, message = Messages.getTypeDifferentFromExpected(PredefinedTypes.getBooleanType(), condType.getValue())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_ifClause.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_ifClause.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return
 
     def visitElifClause(self, _elifClause=None):
@@ -178,14 +179,14 @@ class CorrectExpressionVisitor(NESTMLVisitor):
         condType = _elifClause.getCondition().getTypeEither()
         if condType.isError():
             code, message = Messages.getTypeCouldNotBeDerived(_elifClause.getCondition())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_elifClause.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_elifClause.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         elif not condType.getValue().equals(PredefinedTypes.getBooleanType()):
             code, message = Messages.getTypeDifferentFromExpected(PredefinedTypes.getBooleanType(), condType.getValue())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_elifClause.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_elifClause.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return
 
     def visitWhileStmt(self, _whileStmt=None):
@@ -197,14 +198,14 @@ class CorrectExpressionVisitor(NESTMLVisitor):
         condType = _whileStmt.getCondition().getTypeEither()
         if condType.isError():
             code, message = Messages.getTypeCouldNotBeDerived(_whileStmt.getCondition())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_whileStmt.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_whileStmt.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         elif not condType.getValue().equals(PredefinedTypes.getBooleanType()):
             code, message = Messages.getTypeDifferentFromExpected(PredefinedTypes.getBooleanType(), condType.getValue())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_whileStmt.getCondition().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_whileStmt.getCondition().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return
 
     def visitForStmt(self, _forStmt=None):
@@ -217,26 +218,26 @@ class CorrectExpressionVisitor(NESTMLVisitor):
         fromType = _forStmt.getFrom().getTypeEither()
         if fromType.isError():
             code, message = Messages.getTypeCouldNotBeDerived(_forStmt.getFrom())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_forStmt.getFrom().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_forStmt.getFrom().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         elif not (fromType.getValue().equals(PredefinedTypes.getIntegerType()) or
                       fromType.getValue().equals(PredefinedTypes.getRealType())):
             code, message = Messages.getTypeDifferentFromExpected(PredefinedTypes.getIntegerType(), fromType.getValue())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_forStmt.getFrom().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_forStmt.getFrom().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         # check that the to stmt is an integer or real
         toType = _forStmt.getTo().getTypeEither()
         if toType.isError():
             code, message = Messages.getTypeCouldNotBeDerived(_forStmt.getTo())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_forStmt.getTo().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_forStmt.getTo().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         elif not (toType.getValue().equals(PredefinedTypes.getIntegerType()) or
                       toType.getValue().equals(PredefinedTypes.getRealType())):
             code, message = Messages.getTypeDifferentFromExpected(PredefinedTypes.getIntegerType(), toType.getValue())
-            Logger.logMessage(_neuron=None, _code=code, _message=message,
-                              _errorPosition=_forStmt.getTo().getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(neuron=None, code=code, message=message,
+                               error_position=_forStmt.getTo().getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
         return

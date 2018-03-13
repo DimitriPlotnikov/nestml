@@ -26,7 +26,8 @@ from pynestml.modelprocessor.ErrorStrings import ErrorStrings
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 from pynestml.modelprocessor.Either import Either
 from pynestml.modelprocessor.ASTExpression import ASTExpression
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import MessageCode
 
 
@@ -56,6 +57,6 @@ class LogicalNotVisitor(NESTMLVisitor):
         else:
             errorMsg = ErrorStrings.messageExpectedBool(self, _expr.getSourcePosition())
             _expr.setTypeEither(Either.error(errorMsg))
-            Logger.logMessage(_errorPosition=_expr.getSourcePosition(),
-                              _code=MessageCode.TYPE_DIFFERENT_FROM_EXPECTED,
-                              _message=errorMsg, _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(error_position=_expr.getSourcePosition(),
+                               code=MessageCode.TYPE_DIFFERENT_FROM_EXPECTED,
+                               message=errorMsg, log_level=LOGGING_LEVEL.ERROR)

@@ -19,7 +19,8 @@
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -55,7 +56,7 @@ class CoCoNoNestNameSpaceCollision(CoCo):
         for func in _neuron.getFunctions():
             if func.getName() in cls.__nestNameSpace:
                 code, message = Messages.getNestCollision(func.getName())
-                Logger.logMessage(_errorPosition=func.getSourcePosition(),
-                                  _code=code, _message=message,
-                                  _logLevel=LOGGING_LEVEL.ERROR)
+                Logger.log_message(error_position=func.getSourcePosition(),
+                                   code=code, message=message,
+                                   log_level=LOGGING_LEVEL.ERROR)
         return

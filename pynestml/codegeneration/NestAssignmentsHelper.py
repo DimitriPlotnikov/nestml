@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.modelprocessor.ASTAssignment import ASTAssignment
 from pynestml.modelprocessor.Symbol import SymbolKind
 
@@ -41,7 +42,7 @@ class NestAssignmentsHelper(object):
         if symbol is not None:
             return symbol
         else:
-            Logger.logMessage('No symbol could be resolved!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('No symbol could be resolved!', LOGGING_LEVEL.ERROR)
             return
 
     def printAssignmentsOperation(self, _assignment=None):
@@ -89,7 +90,7 @@ class NestAssignmentsHelper(object):
                         return True
                 return False
         else:
-            Logger.logMessage('No symbol could be resolved!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('No symbol could be resolved!', LOGGING_LEVEL.ERROR)
             return False
 
     def printSizeParameter(self, _assignment=None):

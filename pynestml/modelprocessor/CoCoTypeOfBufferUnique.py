@@ -20,7 +20,8 @@
 from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -72,10 +73,10 @@ class TypeOfBufferUniqueVisitor(NESTMLVisitor):
                         inh += 1
                 if inh > 1:
                     code, message = Messages.getMultipleKeywords('inhibitory')
-                    Logger.logMessage(_errorPosition=_line.getSourcePosition(), _code=code, _message=message,
-                                      _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(error_position=_line.getSourcePosition(), code=code, message=message,
+                                       log_level=LOGGING_LEVEL.ERROR)
                 if ext > 1:
                     code, message = Messages.getMultipleKeywords('excitatory')
-                    Logger.logMessage(_errorPosition=_line.getSourcePosition(), _code=code, _message=message,
-                                      _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(error_position=_line.getSourcePosition(), code=code, message=message,
+                                       log_level=LOGGING_LEVEL.ERROR)
         return

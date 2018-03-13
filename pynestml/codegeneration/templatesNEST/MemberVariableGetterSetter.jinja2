@@ -7,7 +7,7 @@
 
 {%- if variable.isFunction() and not variable.containsSumCall() %}
   inline {{declarations.printVariableType(variable)}} {{names.getter(variable)}}() const {
-    {%- set simpleExpression = odeTransformer.refactor_convolve_call(variable.getDeclaringExpression()) %}
+    {%- set simpleExpression = variable.getDeclaringExpression() %}
     return {{printer.printExpression(simpleExpression)}};
   }
 {% else %}

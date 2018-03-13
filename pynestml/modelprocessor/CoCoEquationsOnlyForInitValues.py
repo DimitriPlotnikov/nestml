@@ -21,7 +21,8 @@ from pynestml.modelprocessor.CoCo import CoCo
 from pynestml.modelprocessor.Symbol import SymbolKind
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.utils.Logger import Logger, LOGGING_LEVEL
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 
 
@@ -72,7 +73,7 @@ class EquationsOnlyForInitValues(NESTMLVisitor):
         symbol = _equation.getScope().resolveToSymbol(_equation.getLhs().getNameOfLhs(), SymbolKind.VARIABLE)
         if symbol is not None and not symbol.isInitValues():
             code, message = Messages.getEquationVarNotInInitValuesBlock(_equation.getLhs().getNameOfLhs())
-            Logger.logMessage(_code=code, _message=message,
-                              _errorPosition=_equation.getSourcePosition(),
-                              _logLevel=LOGGING_LEVEL.ERROR)
+            Logger.log_message(code=code, message=message,
+                               error_position=_equation.getSourcePosition(),
+                               log_level=LOGGING_LEVEL.ERROR)
             return

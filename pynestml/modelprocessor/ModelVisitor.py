@@ -1231,8 +1231,8 @@ class NESTMLVisitor(object):
     def traverseOdeEquation(self, _node):
         if _node.getLhs() is not None:
             _node.getLhs().accept(self.getRealSelf())
-        if _node.getRhs() is not None:
-            _node.getRhs().accept(self.getRealSelf())
+        if _node.get_rhs() is not None:
+            _node.get_rhs().accept(self.getRealSelf())
         return
 
     def traverseOdeFunction(self, _node):

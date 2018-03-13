@@ -29,4 +29,5 @@ script:
   - python tests/ExpressionTypeCalculationTest.py
   - python tests/solver_connector_test.py
   - python tests/solution_transformes_test.py
+  - python tests/nest_codegenerator_test.py
 

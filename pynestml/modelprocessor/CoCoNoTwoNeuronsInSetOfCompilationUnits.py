@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 from pynestml.modelprocessor.CoCo import CoCo
-from pynestml.utils.Logger import LOGGING_LEVEL, Logger
+from pynestml.utils.Logger import Logger
+from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.utils.Messages import Messages
 
@@ -47,7 +48,7 @@ class CoCoNoTwoNeuronsInSetOfCompilationUnits(CoCo):
                     code, message = Messages.getCompilationUnitNameCollision(neuronA.getName(),
                                                                              neuronA.getArtifactName(),
                                                                              neuronB.getArtifactName())
-                    Logger.logMessage(_code=code, _message=message, _logLevel=LOGGING_LEVEL.ERROR)
+                    Logger.log_message(code=code, message=message, log_level=LOGGING_LEVEL.ERROR)
                 conflictingNeurons.append(neuronB)
             checked.append(neuronA)
         return conflictingNeurons
