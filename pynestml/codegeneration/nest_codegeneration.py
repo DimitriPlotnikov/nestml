@@ -19,8 +19,8 @@
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import re
-from copy import deepcopy
 
+from jinja2 import Environment, FileSystemLoader
 from odetoolbox import analysis
 
 from pynestml.codegeneration.ExpressionsPrettyPrinter import ExpressionsPrettyPrinter
@@ -40,6 +40,7 @@ from pynestml.modelprocessor.ASTOdeFunction import ASTOdeFunction
 from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ASTSymbolTableVisitor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ModelParser import ModelParser
+from pynestml.modelprocessor.Symbol import SymbolKind
 from pynestml.solver.TransformerBase import add_assignment_to_update_block
 from pynestml.solver.solution_transformers import integrate_exact_solution
 from pynestml.utils.ASTUtils import ASTUtils
@@ -47,7 +48,6 @@ from pynestml.utils.Logger import Logger
 from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
 from pynestml.utils.OdeTransformer import OdeTransformer
-from jinja2 import Environment, FileSystemLoader
 
 # setup the template environment
 env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templatesNEST')))
@@ -134,16 +134,14 @@ def analyse_and_generate_neuron(neuron):
         replace_functions_through_defining_expressions(equations_block.get_equations(), equations_block.get_functions())
 
     # transform everything into gsl processable (e.g. no shapes) or exact form.
+    transform_shapes_and_odes(neuron, shape_to_buffers)
 
-    neuron = transforme_shapes_and_odes(neuron, shape_to_buffers)
     # update the symbol table
     ASTSymbolTableVisitor.updateSymbolTable(neuron)
 
-    # at that point all shapes are transformed into the ODE form and spikes can be applied
-    print("!!!!!!!!!!!!!!!!!")
-    print(str(neuron))
-    print("!!!!!!!!!!!!!!!!!")
     generate_nest_code(neuron)
+
+    # at that point all shapes are transformed into the ODE form and spikes can be applied
     code, message = Messages.getCodeGenerated(neuron.getName(), FrontendConfiguration.getTargetPath())
     Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
 
@@ -252,57 +250,71 @@ def is_functional_shape_present(shapes):
     return False
 
 
-def transforme_shapes_and_odes(neuron, shape_to_buffers):
+def transform_shapes_and_odes(neuron, shape_to_buffers):
     # type: (ASTNeuron, map(str, str)) -> ASTNeuron
     """
-    Solves all odes and equations in the handed over neuron.
+    Solves all odes andmatcher_computed_handwritten = re.compile(shape + r"(')*")
+                        matcher_computed_shape_odes = re.compile(shape + r"__\d+") equations in the handed over neuron.
     :param neuron: a single neuron instance.
     :return: A transformed version of the neuron that can be passed to the GSL.
     """
     # it should be ensured that most one equations block is present
     result = neuron
+
     if len(neuron.get_equations_blocks()) == 1:
         equations_block = neuron.get_equations_block()
+
         if len(equations_block.get_shapes()) == 0:
             code, message = Messages.getNeuronSolvedBySolver(neuron.getName())
             Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
             result = neuron
         else:
+            initial_values = neuron.get_initial_values_blocks()
             code, message = Messages.getNeuronAnalyzed(neuron.getName())
             Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
             solver_result = solve_ode_with_shapes(equations_block)
 
             if solver_result["solver"] is "analytical":
+                spike_updates = []
+                printer = ExpressionsPrettyPrinter()
+
                 result = integrate_exact_solution(neuron, solver_result)
+
+                for declaration in initial_values.getDeclarations():
+                    variable = declaration.getVariables()[0]
+                    for shape in shape_to_buffers:
+                        matcher_computed_handwritten = re.compile(shape + r"(')*")
+                        matcher_computed_shape_odes = re.compile(shape + r"__\d+")
+                        if re.match(matcher_computed_shape_odes, str(variable)) or \
+                                re.match(matcher_computed_handwritten, str(variable)):
+
+                            assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
+                                                printer.printExpression(declaration.getExpression())
+                            spike_updates.append(ModelParser.parseAssignment(assignment_string))
+                            # the IV is applied. can be reseted
+                            declaration.set_expression(ModelParser.parse_expression("0"))
+                    not_shape = True
+                    for shape in shape_to_buffers:
+                        matcher_computed_handwritten = re.compile(shape + r"(')*")
+                        matcher_computed_shape_odes = re.compile(shape + r"__\d+")
+                        if re.match(matcher_computed_shape_odes, str(variable)) or \
+                                re.match(matcher_computed_handwritten, str(variable)):
+                            not_shape = True
+
+                    if not_shape:
+                        result.addToStateBlock(declaration)
+
+                initial_values.getDeclarations().clear()
+                result.remove_equations_block()
+
+                for assignment in spike_updates:
+                    add_assignment_to_update_block(assignment, result)
 
             elif solver_result["solver"] is "numeric":
                 result = neuron
             else:
                 result = neuron
 
-        # apply spikes, remove initial values for shapes
-        initial_values = neuron.get_initial_values_blocks()
-        spike_updates = []
-        printer = ExpressionsPrettyPrinter()
-        for shape in shape_to_buffers:
-            for declaration in initial_values.getDeclarations():
-                for variable in declaration.getVariables():
-                    matcher_computed_handwritten = re.compile(shape + r"(')*")
-                    matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                    if re.match(matcher_computed_shape_odes, str(variable)) or \
-                       re.match(matcher_computed_handwritten, str(variable)):
-                        assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
-                                            printer.printExpression(declaration.getExpression())
-                        spike_updates.append(ModelParser.parseAssignment(assignment_string))
-
-        for assignment in spike_updates:
-            add_assignment_to_update_block(assignment, result)
-        # copy initial block variables to the state block, since they are not backed through an ODE.
-        # set their value to zero, since the initial values is handles already in the spike application logic
-        for decl in result.get_initial_values_blocks().getDeclarations():
-            decl.set_expression(ModelParser.parse_expression("0"))
-            result.addToStateBlock(decl)
-        result.get_initial_values_blocks().getDeclarations().clear()
     return result
 
 

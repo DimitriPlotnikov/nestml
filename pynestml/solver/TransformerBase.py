@@ -148,7 +148,7 @@ def compute_state_shape_variables_updates(solver_output):
     shape_state_variables = []
 
     for single_shape in solver_output["shape_state_variables"]:
-        shape_state_variables += reversed(single_shape)  # cf. issue #7 on github
+        shape_state_variables += (single_shape)  # cf. issue #7 on github
 
     state_shape_updates = {}
     for i in range(0, len(shape_state_updates)):

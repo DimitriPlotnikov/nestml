@@ -86,6 +86,8 @@ class ShapeUsageVisitor(NESTMLVisitor):
         for shapeName in self.__shapes:
             # in order to allow shadowing by local scopes, we first check if the element has been declared locally
             symbol = _variable.getScope().resolveToSymbol(shapeName, SymbolKind.VARIABLE)
+            if symbol is None:
+                print("!!!!", shapeName)
             # if it is not a shape just continue
             if not symbol.isShape():
                 continue

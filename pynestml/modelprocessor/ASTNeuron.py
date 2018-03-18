@@ -239,10 +239,10 @@ class ASTNeuron(ASTElement):
                 ret.append(elem)
         return ret
 
-    def remove_equations_blocks(self):
+    def remove_equations_block(self):
         # type: (...) -> None
         """
-        Deletes all quations blocks
+        Deletes all equations blocks. By construction as checked through cocos there is only one there.
         """
 
         for elem in self.getBody().getBodyElements():

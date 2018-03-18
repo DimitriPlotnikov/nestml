@@ -21,7 +21,7 @@ import os
 import unittest
 
 from pynestml.codegeneration.nest_codegeneration import generate_nest_module_code, make_functions_self_contained, \
-    replace_functions_through_defining_expressions, transform_ode_and_shapes_to_json, transforme_shapes_and_odes, \
+    replace_functions_through_defining_expressions, transform_ode_and_shapes_to_json, transform_shapes_and_odes, \
     analyse_and_generate_neurons
 from pynestml.frontend.FrontendConfiguration import FrontendConfiguration
 from pynestml.modelprocessor.ModelParser import ModelParser

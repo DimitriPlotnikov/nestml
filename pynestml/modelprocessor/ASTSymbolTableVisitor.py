@@ -693,6 +693,7 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
             symbol.setComment(_odeShape.getComment())
             _odeShape.getScope().addSymbol(symbol)
         _odeShape.getVariable().updateScope(_odeShape.getScope())
+
         cls.visitVariable(_odeShape.getVariable())
         _odeShape.getExpression().updateScope(_odeShape.getScope())
         cls.visitExpression(_odeShape.getExpression())

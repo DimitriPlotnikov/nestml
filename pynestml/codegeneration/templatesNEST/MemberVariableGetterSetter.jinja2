@@ -5,7 +5,7 @@
   @result C++ function
 #}
 
-{%- if variable.isFunction() and not variable.containsSumCall() %}
+{%- if variable.isFunction() %}
   inline {{declarations.printVariableType(variable)}} {{names.getter(variable)}}() const {
     {%- set simpleExpression = variable.getDeclaringExpression() %}
     return {{printer.printExpression(simpleExpression)}};

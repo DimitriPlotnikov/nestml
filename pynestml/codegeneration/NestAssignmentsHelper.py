@@ -38,11 +38,11 @@ class NestAssignmentsHelper(object):
         """
         assert (_assignment is not None and isinstance(_assignment, ASTAssignment)), \
             '(PyNestML.CodeGeneration.Assignments) No or wrong type of assignment provided (%s)!' % type(_assignment)
-        symbol = _assignment.getScope().resolveToSymbol(_assignment.getVariable().getCompleteName(),SymbolKind.VARIABLE)
+        symbol = _assignment.getScope().resolveToSymbol(_assignment.getVariable().getCompleteName(), SymbolKind.VARIABLE)
         if symbol is not None:
             return symbol
         else:
-            Logger.log_message('No symbol could be resolved!', LOGGING_LEVEL.ERROR)
+            Logger.log_message('No symbol for the name {} could be resolved!'.format(_assignment.getVariable().getCompleteName()), LOGGING_LEVEL.ERROR)
             return
 
     def printAssignmentsOperation(self, _assignment=None):

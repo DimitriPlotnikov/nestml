@@ -43,8 +43,5 @@ def integrate_exact_solution(neuron, exact_solution):
     neuron = add_state_updates(state_shape_variables_updates, neuron)
     neuron = replace_integrate_call(neuron, exact_solution)
 
-    if neuron.get_equations_blocks() is not None:
-        neuron.remove_equations_blocks()
-
     return neuron
 
