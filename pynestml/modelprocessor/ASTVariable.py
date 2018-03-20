@@ -73,12 +73,19 @@ class ASTVariable(ASTElement):
         return cls(_name, _differentialOrder, _sourcePosition)
 
     def getName(self):
+        # type: () -> str
         """
-        Returns the name of the variable.
         :return: the name of the variable.
-        :rtype: str
         """
         return self.__name
+
+    def set_name(self, name):
+        # type: (str) -> None
+        """
+        Sets the name of the variable.
+        :name: the name to set.
+        """
+        self.__name = name
 
     def getDifferentialOrder(self):
         """
@@ -87,6 +94,14 @@ class ASTVariable(ASTElement):
         :rtype: int
         """
         return self.__differentialOrder
+
+    def set_differential_order(self, differential_order):
+        # type: (str) -> None
+        """
+        Sets the differential order of the variable.
+        :differential_order: the name to set.
+        """
+        self.__differentialOrder = differential_order
 
     def getCompleteName(self):
         """

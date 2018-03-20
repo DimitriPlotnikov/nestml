@@ -73,6 +73,7 @@ class ASTOdeEquation(ASTElement):
         return cls(_lhs, _rhs, _sourcePosition)
 
     def getLhs(self):
+        # type: () -> ASTVariable
         """
         Returns the left-hand side of the equation.
         :return: an object of the ast-variable class.

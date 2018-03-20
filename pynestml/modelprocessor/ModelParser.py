@@ -24,8 +24,11 @@ from pynestml.generated.PyNESTMLParser import PyNESTMLParser
 from pynestml.modelprocessor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ASTBuilderVisitor import ASTBuilderVisitor
 from pynestml.modelprocessor.ASTHigherOrderVisitor import ASTHigherOrderVisitor
+from pynestml.modelprocessor.ASTOdeEquation import ASTOdeEquation
 from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
+from pynestml.modelprocessor.ASTVariable import ASTVariable
 from pynestml.modelprocessor.SymbolTable import SymbolTable
+from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.utils.Logger import Logger
 from pynestml.utils.LoggingLevel import LOGGING_LEVEL
 from pynestml.utils.Messages import Messages
@@ -68,6 +71,27 @@ class ModelParser(object):
         for neuron in ast.getNeuronList():
             ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
             SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())
+
+        # replace all derived variables through a computer processable names: e.g. g_in''' -> g_in__ddd
+        restore_differential_order = []
+        for ode in ASTUtils.getAll(ast, ASTOdeEquation):
+            lhs_variable = ode.getLhs()
+            if lhs_variable.getDifferentialOrder() > 0:
+                lhs_variable.set_differential_order(lhs_variable.getDifferentialOrder() - 1)
+                restore_differential_order.append(lhs_variable)
+
+        # than replace remaining variables
+        for variable in ASTUtils.getAll(ast, ASTVariable):
+
+            if variable.getDifferentialOrder() > 0:
+                variable.set_name(variable.getName() + "__" + "d" * variable.getDifferentialOrder())
+                variable.set_differential_order(0)
+                print(variable.getName())
+
+        # now also equations have no ' at lhs. replace every occurrence of last d to ' to compensate
+        for equation in restore_differential_order:
+            equation.getLhs().set_differential_order(1)
+
         return ast
 
     @classmethod

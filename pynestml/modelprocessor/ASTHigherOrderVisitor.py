@@ -202,7 +202,7 @@ class ASTHigherOrderVisitor(object):
             '(PyNestML.Visitor.HigherOrder) No or wrong type of function provided (%s)!' % type(_func)
         _func(_ast)
         for neuron in _ast.getNeuronList():
-            cls.visit(neuron)
+            cls.visit(neuron, _func)
         return
 
     @classmethod

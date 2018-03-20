@@ -54,11 +54,12 @@ class CodegeneratorTest(unittest.TestCase):
         compilation_unit = ModelParser.parse_file_and_build_symboltable(iaf_psc_alpha_path)
         assert len(compilation_unit.getNeuronList()) == 1
         ast_neuron = compilation_unit.getNeuronList()[0]
-        ast_neuron = transforme_shapes_and_odes(ast_neuron)
+        ast_neuron = transform_shapes_and_odes(ast_neuron)
         print(ast_neuron)
 
     def test_iaf_psc_alpha(self):
-        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join('..', 'models', 'iaf_psc_alpha.nestml'))))
+        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join(
+            '..', 'models', 'iaf_psc_alpha.nestml'))))
 
         params = list()
         params.append('-path')
@@ -76,6 +77,54 @@ class CodegeneratorTest(unittest.TestCase):
         compilation_unit = ModelParser.parse_file_and_build_symboltable(path)
         generate_nest_module_code(compilation_unit.getNeuronList())
         analyse_and_generate_neurons(compilation_unit.getNeuronList())
+
+    def test_iaf_cond_alpha_implicit(self):
+        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join(
+            '..', 'models', 'iaf_cond_alpha.nestml'))))
+
+        params = list()
+        params.append('-path')
+        params.append(path)
+        # params.append('-dry')
+        params.append('-logging_level')
+        params.append('NO')
+        params.append('-target')
+        params.append('target')
+        params.append('-store_log')
+        params.append('-dev')
+
+        FrontendConfiguration.config(params)
+
+        compilation_unit = ModelParser.parse_file_and_build_symboltable(path)
+
+        iaf_cond_alpha_implicit = list()
+        iaf_cond_alpha_implicit.append(compilation_unit.getNeuronList()[1])
+        generate_nest_module_code(iaf_cond_alpha_implicit)
+        analyse_and_generate_neurons(iaf_cond_alpha_implicit)
+
+    def test_iaf_cond_alpha_functional(self):
+        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join(
+            '..', 'models', 'iaf_cond_alpha.nestml'))))
+
+        params = list()
+        params.append('-path')
+        params.append(path)
+        # params.append('-dry')
+        params.append('-logging_level')
+        params.append('NO')
+        params.append('-target')
+        params.append('target')
+        params.append('-store_log')
+        params.append('-dev')
+
+        FrontendConfiguration.config(params)
+
+        compilation_unit = ModelParser.parse_file_and_build_symboltable(path)
+
+        iaf_cond_alpha_functional = list()
+        iaf_cond_alpha_functional.append(compilation_unit.getNeuronList()[0])
+        generate_nest_module_code(iaf_cond_alpha_functional)
+        analyse_and_generate_neurons(iaf_cond_alpha_functional)
 
 
 if __name__ == '__main__':
