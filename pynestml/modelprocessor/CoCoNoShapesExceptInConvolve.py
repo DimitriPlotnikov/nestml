@@ -87,7 +87,7 @@ class ShapeUsageVisitor(NESTMLVisitor):
             # in order to allow shadowing by local scopes, we first check if the element has been declared locally
             symbol = _variable.getScope().resolveToSymbol(shapeName, SymbolKind.VARIABLE)
             # if it is not a shape just continue
-            if not symbol.isShape():
+            if symbol is None or not symbol.isShape():
                 continue
             if _variable.getCompleteName() == shapeName:
                 parent = self.__neuronNode.getParent(_variable)

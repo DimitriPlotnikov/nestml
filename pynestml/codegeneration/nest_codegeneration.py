@@ -41,6 +41,7 @@ from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ASTSymbolTableVisitor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.modelprocessor.Symbol import SymbolKind
+from pynestml.modelprocessor.VariableSymbol import VariableSymbol
 from pynestml.solver.TransformerBase import add_assignment_to_update_block
 from pynestml.solver.solution_transformers import integrate_exact_solution
 from pynestml.utils.ASTUtils import ASTUtils
@@ -226,7 +227,7 @@ def define_solver_type(neuron, namespace):
     namespace['useGSL'] = False
     if neuron.get_equations_block() is not None and len(neuron.get_equations_block().getDeclarations()) > 0:
         if (not is_functional_shape_present(neuron.get_equations_block().get_shapes())) or \
-                        len(neuron.get_equations_block().get_equations()) > 1:
+                len(neuron.get_equations_block().get_equations()) > 1:
             namespace['names'] = GSLNamesConverter()
             namespace['useGSL'] = True
             converter = NESTReferenceConverter(True)
@@ -283,11 +284,8 @@ def transform_shapes_and_odes(neuron, shape_to_buffers):
                 for declaration in initial_values.getDeclarations():
                     variable = declaration.getVariables()[0]
                     for shape in shape_to_buffers:
-                        matcher_computed_handwritten = re.compile(shape + r"(')*")
                         matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                        if re.match(matcher_computed_shape_odes, str(variable)) or \
-                                re.match(matcher_computed_handwritten, str(variable)):
-
+                        if re.match(matcher_computed_shape_odes, str(variable)):
                             assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
                                                 printer.printExpression(declaration.getExpression())
                             spike_updates.append(ModelParser.parseAssignment(assignment_string))
@@ -295,10 +293,8 @@ def transform_shapes_and_odes(neuron, shape_to_buffers):
                             declaration.set_expression(ModelParser.parse_expression("0"))
                     not_shape = True
                     for shape in shape_to_buffers:
-                        matcher_computed_handwritten = re.compile(shape + r"(')*")
                         matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                        if re.match(matcher_computed_shape_odes, str(variable)) or \
-                                re.match(matcher_computed_handwritten, str(variable)):
+                        if re.match(matcher_computed_shape_odes, str(variable)):
                             not_shape = True
 
                     if not_shape:
@@ -340,10 +336,39 @@ def transform_ode_and_shapes_to_json(equations_block):
         result["odes"].append({"symbol": equation.getLhs().getName(),
                                "definition": printer.printExpression(equation.get_rhs())})
 
+    ode_shape_names = set()
     for shape in equations_block.get_shapes():
-        result["shapes"].append({"type": "function",
-                                 "symbol": shape.getVariable().getCompleteName(),
-                                 "definition": printer.printExpression(shape.getExpression())})
+        if shape.getVariable().getDifferentialOrder() == 0:
+            result["shapes"].append({"type": "function",
+                                     "symbol": shape.getVariable().getCompleteName(),
+                                     "definition": printer.printExpression(shape.getExpression())})
+
+        else:
+            if '__' not in shape.getVariable().getName():
+                ode_shape_names.add(shape.getVariable().getName())
+
+    # try to resolve all available initial values
+    shape_name_to_initial_values = {}
+    shape_name_to_shape_definition = {}
+
+    for shape_name in ode_shape_names:
+        shape_name_symbol = equations_block.getScope().resolveToAllSymbols(shape_name, SymbolKind.VARIABLE)
+        shape_name_to_initial_values[shape_name] = [printer.printExpression(shape_name_symbol.getDeclaringExpression())]
+        order = 1
+        while True:
+            shape_name_symbol = equations_block.getScope().resolveToAllSymbols(shape_name + "__" + 'd' * order, SymbolKind.VARIABLE)
+            if shape_name_symbol is not None:
+                shape_name_to_initial_values[shape_name].append(printer.printExpression(shape_name_symbol.getDeclaringExpression()))
+                shape_name_to_shape_definition[shape_name] = printer.printExpression(shape_name_symbol.getOdeDefinition())
+            else:
+                break
+            order = order + 1
+
+    for shape_name in ode_shape_names:
+            result["shapes"].append({"type": "ode",
+                                     "symbol": shape_name,
+                                     "definition": shape_name_to_shape_definition[shape_name],
+                                     "initial_values": shape_name_to_initial_values[shape_name]})
 
     result["parameters"] = []  # ode-framework requires this.
     return result

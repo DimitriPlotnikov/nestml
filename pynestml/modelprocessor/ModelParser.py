@@ -25,6 +25,7 @@ from pynestml.modelprocessor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ASTBuilderVisitor import ASTBuilderVisitor
 from pynestml.modelprocessor.ASTHigherOrderVisitor import ASTHigherOrderVisitor
 from pynestml.modelprocessor.ASTOdeEquation import ASTOdeEquation
+from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ASTSourcePosition import ASTSourcePosition
 from pynestml.modelprocessor.ASTVariable import ASTVariable
 from pynestml.modelprocessor.SymbolTable import SymbolTable
@@ -80,6 +81,12 @@ class ModelParser(object):
                 lhs_variable.set_differential_order(lhs_variable.getDifferentialOrder() - 1)
                 restore_differential_order.append(lhs_variable)
 
+        for shape in ASTUtils.getAll(ast, ASTOdeShape):
+            lhs_variable = shape.getVariable()
+            if lhs_variable.getDifferentialOrder() > 0:
+                lhs_variable.set_differential_order(lhs_variable.getDifferentialOrder() - 1)
+                restore_differential_order.append(lhs_variable)
+
         # than replace remaining variables
         for variable in ASTUtils.getAll(ast, ASTVariable):
 
@@ -89,9 +96,12 @@ class ModelParser(object):
                 print(variable.getName())
 
         # now also equations have no ' at lhs. replace every occurrence of last d to ' to compensate
-        for equation in restore_differential_order:
-            equation.getLhs().set_differential_order(1)
-
+        for ode_variable in restore_differential_order:
+            ode_variable.set_differential_order(1)
+        print("!!!!", ast)
+        for neuron in ast.getNeuronList():
+            ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
+            SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())
         return ast
 
     @classmethod
