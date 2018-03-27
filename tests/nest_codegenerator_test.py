@@ -54,7 +54,7 @@ class CodegeneratorTest(unittest.TestCase):
         compilation_unit = ModelParser.parse_file_and_build_symboltable(iaf_psc_alpha_path)
         assert len(compilation_unit.getNeuronList()) == 1
         ast_neuron = compilation_unit.getNeuronList()[0]
-        ast_neuron = transform_shapes_and_odes(ast_neuron)
+        ast_neuron = transform_shapes_and_odes(ast_neuron, {})
         print(ast_neuron)
 
     def test_iaf_psc_alpha(self):

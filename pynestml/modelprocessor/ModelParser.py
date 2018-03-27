@@ -93,12 +93,11 @@ class ModelParser(object):
             if variable.getDifferentialOrder() > 0:
                 variable.set_name(variable.getName() + "__" + "d" * variable.getDifferentialOrder())
                 variable.set_differential_order(0)
-                print(variable.getName())
 
         # now also equations have no ' at lhs. replace every occurrence of last d to ' to compensate
         for ode_variable in restore_differential_order:
             ode_variable.set_differential_order(1)
-        print("!!!!", ast)
+
         for neuron in ast.getNeuronList():
             ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
             SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())

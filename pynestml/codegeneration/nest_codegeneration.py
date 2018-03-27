@@ -43,7 +43,7 @@ from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.modelprocessor.Symbol import SymbolKind
 from pynestml.modelprocessor.VariableSymbol import VariableSymbol
 from pynestml.solver.TransformerBase import add_assignment_to_update_block
-from pynestml.solver.solution_transformers import integrate_exact_solution
+from pynestml.solver.solution_transformers import integrate_exact_solution, functional_shapes_to_odes
 from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.utils.Logger import Logger
 from pynestml.utils.LoggingLevel import LOGGING_LEVEL
@@ -254,9 +254,9 @@ def is_functional_shape_present(shapes):
 def transform_shapes_and_odes(neuron, shape_to_buffers):
     # type: (ASTNeuron, map(str, str)) -> ASTNeuron
     """
-    Solves all odes andmatcher_computed_handwritten = re.compile(shape + r"(')*")
-                        matcher_computed_shape_odes = re.compile(shape + r"__\d+") equations in the handed over neuron.
+    Solves all odes and equations in the handed over neuron.
     :param neuron: a single neuron instance.
+    :param shape_to_buffers: Map of shape names to buffers to which they were connected.
     :return: A transformed version of the neuron that can be passed to the GSL.
     """
     # it should be ensured that most one equations block is present
@@ -276,41 +276,42 @@ def transform_shapes_and_odes(neuron, shape_to_buffers):
             solver_result = solve_ode_with_shapes(equations_block)
 
             if solver_result["solver"] is "analytical":
-                spike_updates = []
                 printer = ExpressionsPrettyPrinter()
-
                 result = integrate_exact_solution(neuron, solver_result)
 
-                for declaration in initial_values.getDeclarations():
-                    variable = declaration.getVariables()[0]
-                    for shape in shape_to_buffers:
-                        matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                        if re.match(matcher_computed_shape_odes, str(variable)):
-                            assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
-                                                printer.printExpression(declaration.getExpression())
-                            spike_updates.append(ModelParser.parseAssignment(assignment_string))
-                            # the IV is applied. can be reseted
-                            declaration.set_expression(ModelParser.parse_expression("0"))
-                    not_shape = True
-                    for shape in shape_to_buffers:
-                        matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                        if re.match(matcher_computed_shape_odes, str(variable)):
-                            not_shape = True
-
-                    if not_shape:
-                        result.addToStateBlock(declaration)
-
-                initial_values.getDeclarations().clear()
                 result.remove_equations_block()
-
-                for assignment in spike_updates:
-                    add_assignment_to_update_block(assignment, result)
-
             elif solver_result["solver"] is "numeric":
-                result = neuron
+                print(solver_result)
+                result = functional_shapes_to_odes(neuron, solver_result)
+
             else:
                 result = neuron
 
+            spike_updates = []
+            for declaration in initial_values.getDeclarations():
+                variable = declaration.getVariables()[0]
+                for shape in shape_to_buffers:
+                    matcher_computed_shape_odes = re.compile(shape + r"__\d+")
+                    if re.match(matcher_computed_shape_odes, str(variable)):
+                        assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
+                                            printer.printExpression(declaration.getExpression())
+                        spike_updates.append(ModelParser.parseAssignment(assignment_string))
+                        # the IV is applied. can be reseted
+                        declaration.set_expression(ModelParser.parse_expression("0"))
+                not_shape = True
+                for shape in shape_to_buffers:
+                    matcher_computed_shape_odes = re.compile(shape + r"__\d+")
+                    if re.match(matcher_computed_shape_odes, str(variable)):
+                        not_shape = True
+
+                if not_shape:
+                    result.addToStateBlock(declaration)
+
+            initial_values.getDeclarations().clear()
+
+            for assignment in spike_updates:
+                add_assignment_to_update_block(assignment, result)
+    print(result)
     return result
 
 

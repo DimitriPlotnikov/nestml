@@ -625,6 +625,15 @@ class ASTNeuron(ASTElement):
         self.get_initial_values_blocks().getDeclarations().append(_declaration)
         return
 
+    def add_shape(self, shape):
+        # type: (ASTOdeShape) -> None
+        """
+        Adds the handed over declaration to the initial values block.
+        :param shape: a single declaration.
+        """
+        assert self.get_equations_block() is not None
+        self.get_equations_block().getDeclarations().append(shape)
+
     """
     The following print methods are used by the backend and represent the comments as stored at the corresponding 
     parts of the neuron definition.

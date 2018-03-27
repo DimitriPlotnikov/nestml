@@ -12,7 +12,7 @@ extern "C" inline int {{neuronName}}_dynamics(double, const double ode_state[], 
 
   // ode_state[] here is---and must be---the state vector supplied by the integrator,
   // not the state vector in the node, node.S_.ode_state[].
-  {%- for ode in neuron.get_equations_blocks().getDeclarations() -%}
+  {%- for ode in neuron.get_equations_block().getDeclarations() -%}
     {%- for function in utils.getAliasSymbols(ode) -%}
       {%- if not function.isEquation() -%}
         {% set declaringExpression = function.getDeclaringExpression() -%}
