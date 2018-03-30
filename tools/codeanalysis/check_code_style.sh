@@ -77,7 +77,7 @@ Usage: ./extras/check_code_style.sh [options ...]
 
 This script processes C/C++ and Python source code files to verify compliance with the NEST
 coding  style  guidelines.  The  checks are performed the same way as in the NEST Travis CI
-build and test_building_symboltable_for_all_neurons environment. If no file is specified, a local 'git diff' is issued to obtain
+build and test environment. If no file is specified, a local 'git diff' is issued to obtain
 the changed files in the commit range '<git-sha-start>..<git-sha-end>'. By default, this is 
 'master..head'.
 
@@ -109,13 +109,13 @@ Options:
                                      Default: --cppcheck=cppcheck
                                      Note: CPPCHECK version 1.69 or later is required.
                                            This corresponds to the version installed in
-                                           the NEST Travis CI build and test_building_symboltable_for_all_neurons environment.
+                                           the NEST Travis CI build and test environment.
 
     --clang-format=exe               The name of the CLANG-FORMAT executable.
                                      Default: --clang-format=clang-format-3.6
                                      Note: CLANG-FORMAT version 3.6 is required.
                                            This corresponds to the version installed in
-                                           the NEST Travis CI build and test_building_symboltable_for_all_neurons environment.
+                                           the NEST Travis CI build and test environment.
 
     --pep8=exe                       The name of the PEP8 executable.
                                      Default: --pep8=pep8
@@ -142,7 +142,7 @@ echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + 
 echo
 
 # Process parameters.
-while test_building_symboltable_for_all_neurons $# -gt 0 ; do
+while test $# -gt 0 ; do
   case "$1" in
       --help)
           usage

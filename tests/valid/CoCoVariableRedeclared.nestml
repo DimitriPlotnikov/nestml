@@ -20,7 +20,7 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This test_building_symboltable_for_all_neurons is used to test_building_symboltable_for_all_neurons the functionality of the coco which ensures that redeclaration of symbols is detected
+ * This test is used to test the functionality of the coco which ensures that redeclaration of symbols is detected
  * Positive case.
 */
 neuron CoCoVariableRedeclared:

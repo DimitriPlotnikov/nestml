@@ -100,6 +100,7 @@ class ModelParser(object):
         for ode_variable in restore_differential_order:
             ode_variable.set_differential_order(1)
 
+        Logger.initLogger(Logger.get_current_logging_level())
         for neuron in ast.getNeuronList():
             ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
             SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())

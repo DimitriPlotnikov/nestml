@@ -50,19 +50,22 @@ class CoCoFunctionUnique(CoCo):
                             if funcA is not funcB and funcB not in checked:
                                 if funcA.isPredefined():
                                     code, message = Messages.getFunctionRedeclared(funcA.getSymbolName(), True)
-                                    Logger.log_message(error_position=funcB.getReferencedObject().getSourcePosition(),
+                                    Logger.log_message(error_position=funcB.referenced_object.getSourcePosition(),
                                                        log_level=LOGGING_LEVEL.ERROR,
-                                                       message=message, code=code)
+                                                       message=message,
+                                                       code=code)
                                 elif funcB.isPredefined():
                                     code, message = Messages.getFunctionRedeclared(funcA.getSymbolName(), True)
-                                    Logger.log_message(error_position=funcA.getReferencedObject().getSourcePosition(),
+                                    Logger.log_message(error_position=funcA.referenced_object.getSourcePosition(),
                                                        log_level=LOGGING_LEVEL.ERROR,
-                                                       message=message, code=code)
+                                                       message=message,
+                                                       code=code)
                                 else:
                                     code, message = Messages.getFunctionRedeclared(funcA.getSymbolName(), False)
-                                    Logger.log_message(error_position=funcB.getReferencedObject().getSourcePosition(),
+                                    Logger.log_message(error_position=funcB.referenced_object.getSourcePosition(),
                                                        log_level=LOGGING_LEVEL.ERROR,
-                                                       message=message, code=code)
+                                                       message=message,
+                                                       code=code)
                         checked.append(funcA)
             checkedFuncsNames.append(func.getName())
         return

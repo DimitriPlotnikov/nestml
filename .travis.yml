@@ -7,12 +7,12 @@ python:
 
 before_install:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
-  - sudo python setup.py install
-
-install:
   - pip install --upgrade pip enum34
   - pip install -r requirements.txt
   - pip install git+https://github.com/DimitriPlotnikov/ode-toolbox.git
+
+install:
+  - python setup.py install
 
 sudo: true
 
@@ -27,7 +27,6 @@ script:
   - python tests/PyNestMLFrontendTest.py
   - python tests/NESTMLTest.py
   - python tests/ExpressionTypeCalculationTest.py
-  - python tests/solver_connector_test.py
   - python tests/solution_transformes_test.py
   - python tests/nest_codegenerator_test.py
 

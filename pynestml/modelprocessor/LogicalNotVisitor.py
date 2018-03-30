@@ -21,14 +21,8 @@
 """
 expression: logicalNot='not' term=expression
 """
-from pynestml.modelprocessor.PredefinedTypes import PredefinedTypes
-from pynestml.modelprocessor.ErrorStrings import ErrorStrings
-from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
-from pynestml.modelprocessor.Either import Either
 from pynestml.modelprocessor.ASTExpression import ASTExpression
-from pynestml.utils.Logger import Logger
-from pynestml.utils.LoggingLevel import LOGGING_LEVEL
-from pynestml.utils.Messages import MessageCode
+from pynestml.modelprocessor.ModelVisitor import NESTMLVisitor
 
 
 class LogicalNotVisitor(NESTMLVisitor):
@@ -36,27 +30,13 @@ class LogicalNotVisitor(NESTMLVisitor):
     Visits a single expression and updates the type of the sub-expression.
     """
 
-    def visitExpression(self, _expr=None):
+    def visit_expression(self, _expr=None):
         """
         Visits a single expression with a logical operator and updates the type.
         :param _expr: a single expression
         :type _expr: ASTExpression
         """
-        assert (_expr is not None and isinstance(_expr, ASTExpression)), \
-            '(PyNestML.Visitor.LogicalNotVisitor) No or wrong type of visitor provided (%s)!' % type(_expr)
-        exprTypeE = _expr.getExpression().getTypeEither()
+        expr_type = _expr.getExpression().type
 
-        if exprTypeE.isError():
-            _expr.setTypeEither(exprTypeE)
-            return
-
-        exprType = exprTypeE.getValue()
-
-        if exprType.isBoolean():
-            _expr.setTypeEither(Either.value(PredefinedTypes.getBooleanType()))
-        else:
-            errorMsg = ErrorStrings.messageExpectedBool(self, _expr.getSourcePosition())
-            _expr.setTypeEither(Either.error(errorMsg))
-            Logger.log_message(error_position=_expr.getSourcePosition(),
-                               code=MessageCode.TYPE_DIFFERENT_FROM_EXPECTED,
-                               message=errorMsg, log_level=LOGGING_LEVEL.ERROR)
+        expr_type.referenced_object = _expr.getExpression()
+        _expr.type = expr_type.negate()

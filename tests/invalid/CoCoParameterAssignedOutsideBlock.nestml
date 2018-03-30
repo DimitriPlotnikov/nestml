@@ -27,11 +27,11 @@
 neuron CoCoParameterAssignedOutsideBlock:
 
     parameters:
-        test_building_symboltable_for_all_neurons mV = 10mV
+        test mV = 10mV
     end
 
     update:
-        test_building_symboltable_for_all_neurons = 20mV
+        test = 20mV
     end
 
     input:

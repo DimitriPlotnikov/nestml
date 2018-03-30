@@ -47,6 +47,10 @@ class Logger(object):
     __currentNeuron = None
 
     @classmethod
+    def get_current_logging_level(cls):
+        return cls.__loggingLevel
+
+    @classmethod
     def initLogger(cls, _loggingLevel=None):
         """
         Initializes the logger.

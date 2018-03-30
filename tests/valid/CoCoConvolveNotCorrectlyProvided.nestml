@@ -20,7 +20,7 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test_building_symboltable_for_all_neurons if broken CoCos are identified correctly. Here, if convolve has been correctly
+ * This model is used to test if broken CoCos are identified correctly. Here, if convolve has been correctly
  * provided with a initial_block variable and a spike buffer.
  * Positive case.
 */
@@ -28,8 +28,8 @@
 neuron CoCoConvolveNotCorrectlyProvided:
 
     equations:
-        shape test_building_symboltable_for_all_neurons = 10
-        function testB pA = convolve(test_building_symboltable_for_all_neurons, spikeExc) # convolve provided with a shape and a buffer, thus correct
+        shape test = 10
+        function testB pA = convolve(test, spikeExc) # convolve provided with a shape and a buffer, thus correct
     end
 
     update:

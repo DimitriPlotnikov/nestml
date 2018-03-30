@@ -56,7 +56,7 @@ class CoCoAllVariablesDefined(CoCo):
         for expr in expressions:
             for var in expr.getVariables():
                 symbol = var.getScope().resolveToSymbol(var.getCompleteName(), SymbolKind.VARIABLE)
-                # first test_building_symboltable_for_all_neurons if the symbol has been defined at least
+                # first test if the symbol has been defined at least
                 if symbol is None:
                     code, message = Messages.getNoVariableFound(var.getName())
                     Logger.log_message(neuron=_neuron, code=code, message=message, log_level=LOGGING_LEVEL.ERROR,
@@ -65,15 +65,15 @@ class CoCoAllVariablesDefined(CoCo):
                 elif not symbol.isPredefined() and symbol.getBlockType() != BlockType.INPUT_BUFFER_CURRENT and \
                                 symbol.getBlockType() != BlockType.INPUT_BUFFER_SPIKE:
                     # except for parameters, those can be defined after
-                    if not symbol.getReferencedObject().getSourcePosition().before(var.getSourcePosition()) and \
+                    if not symbol.referenced_object.getSourcePosition().before(var.getSourcePosition()) and \
                                     symbol.getBlockType() != BlockType.PARAMETERS:
                         code, message = Messages.getVariableUsedBeforeDeclaration(var.getName())
                         Logger.log_message(neuron=_neuron, message=message, error_position=var.getSourcePosition(),
                                            code=code, log_level=LOGGING_LEVEL.ERROR)
                         # now check that they are now defined recursively, e.g. V_m mV = V_m + 1
-                    if symbol.getReferencedObject().getSourcePosition().encloses(var.getSourcePosition()) and not \
-                            symbol.getReferencedObject().getSourcePosition().isAddedSourcePosition():
+                    if symbol.referenced_object.getSourcePosition().encloses(var.getSourcePosition()) and not \
+                            symbol.referenced_object.getSourcePosition().isAddedSourcePosition():
                         code, message = Messages.getVariableDefinedRecursively(var.getName())
-                        Logger.log_message(code=code, message=message, error_position=symbol.getReferencedObject().
+                        Logger.log_message(code=code, message=message, error_position=symbol.referenced_object.
                                            getSourcePosition(), log_level=LOGGING_LEVEL.ERROR, neuron=_neuron)
         return

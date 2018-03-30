@@ -21,20 +21,20 @@ an exact solution if possible or use an appropriate numeric solver otherwise.
 In order to execute the language tool-chain, Python in version 2 or 3 is required. A setup file is provided and can be installed by 
 
 ```
-python2 setup.py install
+python2 setup.py install --user
 ```
 
 For Python in version 3, respectively:
 
 ```
-python3 setup.py install
+python3 setup.py install --user
 ```
 
 Correct installation can be tested by 
 
 ```
-python setup.py test_building_symboltable_for_all_neurons
-\# respectively python3 setup.py test_building_symboltable_for_all_neurons
+python2 setup.py test
+\# respectively python3 setup.py test 
 ```
 
 In order to ensure correct installation and resolving of dependencies, Python's package manager [_pip_](https://pip.pypa.io/en/stable/installing/), the distribution tool [_setuptools_](https://packaging.python.org/tutorials/installing-packages/) as well as the python-dev package are required and should be installed in advance. The setup file additionally installs the following components:

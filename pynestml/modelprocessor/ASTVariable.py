@@ -17,12 +17,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
+from copy import copy
 
-from pynestml.modelprocessor.ASTNode import ASTElement
+from pynestml.modelprocessor.ASTNode import ASTNode
 from pynestml.modelprocessor.Either import Either
 
 
-class ASTVariable(ASTElement):
+class ASTVariable(ASTNode):
     """
     This class is used to store a single variable.
     
@@ -71,6 +72,12 @@ class ASTVariable(ASTElement):
         :rtype: ASTVariable
         """
         return cls(_name, _differentialOrder, _sourcePosition)
+
+    def resolveInOwnScope(self):
+        from pynestml.modelprocessor.Symbol import SymbolKind
+        assert self.getScope() is not None
+
+        return self.getScope().resolveToSymbol(self.getCompleteName(), SymbolKind.VARIABLE)
 
     def getName(self):
         # type: () -> str
@@ -128,7 +135,7 @@ class ASTVariable(ASTElement):
         :return: a single type symbol.
         :rtype: TypeSymbol
         """
-        return self.__typeSymbol
+        return copy(self.__typeSymbol)
 
     def setTypeSymbol(self, _typeSymbol=None):
         """

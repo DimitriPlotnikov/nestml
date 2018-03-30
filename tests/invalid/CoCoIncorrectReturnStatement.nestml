@@ -20,7 +20,7 @@
  *  along with NEST.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This model is used to test_building_symboltable_for_all_neurons if broken CoCos are identified correctly. Here, if user defined functions without
+ * This model is used to test if broken CoCos are identified correctly. Here, if user defined functions without
  * a proper return statement and wrong type are detected.
  * Negative case.
 */
@@ -37,13 +37,13 @@ neuron CoCoIncorrectReturnStatement:
     output: spike
 
     function foo() mV:
-        test_building_symboltable_for_all_neurons mV = 10mV
+        test mV = 10mV
 
-        if test_building_symboltable_for_all_neurons == 10mV:
-            return test_building_symboltable_for_all_neurons
+        if test == 10mV:
+            return test
         else:
             return 20mV # here, it should be detected, that it is not the last statement
-            test_building_symboltable_for_all_neurons = 20mV
+            test = 20mV
         end
 
         return True# here, it should be detected, that the type is wrong
@@ -59,8 +59,8 @@ neuron CoCoIncorrectReturnStatement:
 
     function foobar() mV:
         # here, it should be detected that no return statement has been provided
-        test_building_symboltable_for_all_neurons mV = 10mV
-        test_building_symboltable_for_all_neurons = test_building_symboltable_for_all_neurons*2
+        test mV = 10mV
+        test = test*2
     end
 
 end

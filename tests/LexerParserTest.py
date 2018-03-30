@@ -28,7 +28,7 @@ from pynestml.generated.PyNESTMLParser import PyNESTMLParser
 
 class LexerParserTest(unittest.TestCase):
     """
-    This test_building_symboltable_for_all_neurons is used to test_building_symboltable_for_all_neurons the parser and lexer for correct functionality.
+    This test is used to test the parser and lexer for correct functionality.
     """
 
     def test(self):

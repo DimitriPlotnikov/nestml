@@ -21,14 +21,13 @@
 
 from pynestml.modelprocessor.ASTBody import ASTBody
 from pynestml.modelprocessor.ASTEquationsBlock import ASTEquationsBlock
+from pynestml.modelprocessor.ASTNode import ASTNode
 from pynestml.modelprocessor.VariableSymbol import VariableSymbol
-from pynestml.modelprocessor.ASTNode import ASTElement
-from pynestml.utils.Logger import Logger
-from pynestml.utils.LoggingLevel import LOGGING_LEVEL
+from pynestml.utils.Logger import LOGGING_LEVEL, Logger
 from pynestml.utils.Messages import Messages
 
 
-class ASTNeuron(ASTElement):
+class ASTNeuron(ASTNode):
     """
     This class is used to store instances of neurons.
     ASTNeuron represents neuron.

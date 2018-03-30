@@ -43,7 +43,7 @@ PredefinedFunctions.registerPredefinedFunctions()
 
 class SymbolTableResolutionTest(unittest.TestCase):
     """
-    This test_building_symboltable_for_all_neurons is used to check if the resolution of symbols works as expected.
+    This test is used to check if the resolution of symbols works as expected.
     """
 
     def test(self):

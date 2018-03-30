@@ -30,7 +30,7 @@ Logger.initLogger(LOGGING_LEVEL.INFO)
 
 class SymbolTableBuilderTest(unittest.TestCase):
 
-    def test_building_symboltable_for_all_neurons(self):
+    def test(self):
         for filename in os.listdir(os.path.realpath(os.path.join(os.path.dirname(__file__),
                                                                  os.path.join('..', 'models')))):
             if filename.endswith(".nestml"):
