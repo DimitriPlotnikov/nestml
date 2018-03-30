@@ -848,8 +848,8 @@ class ASTHigherOrderVisitor(object):
         assert (_func is not None and callable(_func)), \
             '(PyNestML.Visitor.HigherOrder) No or wrong type of function provided (%s)!' % type(_func)
         _func(_ast)
-        if _ast.hasExpr():
-            cls.visitExpression(_ast.getExpr(), _func)
+        if _ast.hasExpression():
+            cls.visitExpression(_ast.getExpression(), _func)
         return
 
     @classmethod

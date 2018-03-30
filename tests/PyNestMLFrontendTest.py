@@ -26,17 +26,16 @@ class PyNestMLFrontendTest(unittest.TestCase):
     """
     Tests if the frontend works as intended and is able to process handed over arguments.
     """
-
-    def test(self):
-        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__),os.path.join('..', 'models'))))
+    def test_all_nestml_models(self):
+        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                                 os.path.join('..', 'models'))))
         params = list()
         params.append('-path')
         params.append(path)
-        #params.append('-dry')
         params.append('-logging_level')
         params.append('NO')
         params.append('-target')
-        params.append('target/models')
+        params.append('target')
         params.append('-store_log')
         params.append('-dev')
         main(params)

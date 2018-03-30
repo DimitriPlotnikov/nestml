@@ -41,9 +41,9 @@ from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ASTSymbolTableVisitor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.modelprocessor.Symbol import SymbolKind
-from pynestml.modelprocessor.VariableSymbol import VariableSymbol
 from pynestml.solver.TransformerBase import add_assignment_to_update_block
-from pynestml.solver.solution_transformers import integrate_exact_solution, functional_shapes_to_odes
+from pynestml.solver.solution_transformers import integrate_exact_solution, functional_shapes_to_odes, \
+    integrate_delta_solution
 from pynestml.utils.ASTUtils import ASTUtils
 from pynestml.utils.Logger import Logger
 from pynestml.utils.LoggingLevel import LOGGING_LEVEL
@@ -65,6 +65,7 @@ template_neuron_h_file = env.get_template('NeuronHeader.jinja2')
 # setup the neuron implementation template
 template_neuron_cpp_file = env.get_template('NeuronClass.jinja2')
 
+_printer = ExpressionsPrettyPrinter()
 
 def generate_nest_module_code(neurons):
     # type: (list(ASTNeuron)) -> None
@@ -107,6 +108,7 @@ def analyse_and_generate_neurons(neurons):
     :param neurons: a list of neurons.
     """
     for neuron in neurons:
+        print("Generates code for the neuron {}.".format(neuron.getName()))
         analyse_and_generate_neuron(neuron)
 
 
@@ -126,7 +128,6 @@ def analyse_and_generate_neuron(neuron):
     if neuron.get_equations_block() is not None:
         # extract function names and corresponding incoming buffers
         convolve_calls = OdeTransformer.get_sumFunctionCalls(equations_block)
-
         for convolve in convolve_calls:
             shape_to_buffers[str(convolve.getArgs()[0])] = str(convolve.getArgs()[1])
 
@@ -134,11 +135,10 @@ def analyse_and_generate_neuron(neuron):
         make_functions_self_contained(equations_block.get_functions())
         replace_functions_through_defining_expressions(equations_block.get_equations(), equations_block.get_functions())
 
-    # transform everything into gsl processable (e.g. no shapes) or exact form.
-    transform_shapes_and_odes(neuron, shape_to_buffers)
-
-    # update the symbol table
-    ASTSymbolTableVisitor.updateSymbolTable(neuron)
+        # transform everything into gsl processable (e.g. no functional shapes) or exact form.
+        transform_shapes_and_odes(neuron, shape_to_buffers)
+        # update the symbol table
+        ASTSymbolTableVisitor.updateSymbolTable(neuron)
 
     generate_nest_code(neuron)
 
@@ -266,53 +266,65 @@ def transform_shapes_and_odes(neuron, shape_to_buffers):
         equations_block = neuron.get_equations_block()
 
         if len(equations_block.get_shapes()) == 0:
-            code, message = Messages.getNeuronSolvedBySolver(neuron.getName())
+            code, message = Messages.getNeuronSolvedByGSL(neuron.getName())
             Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
             result = neuron
-        else:
-            initial_values = neuron.get_initial_values_blocks()
+        if len(equations_block.get_shapes()) == 1 and \
+                str(equations_block.get_shapes()[0].getExpression()).strip().startswith("delta"): # assume the model is well formed
+            shape = equations_block.get_shapes()[0]
+
+            integrate_delta_solution(equations_block, neuron, shape, shape_to_buffers)
+            return result
+
+        elif len(equations_block.get_equations()) == 1:
             code, message = Messages.getNeuronAnalyzed(neuron.getName())
             Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
             solver_result = solve_ode_with_shapes(equations_block)
 
             if solver_result["solver"] is "analytical":
-                printer = ExpressionsPrettyPrinter()
                 result = integrate_exact_solution(neuron, solver_result)
-
                 result.remove_equations_block()
             elif solver_result["solver"] is "numeric":
-                print(solver_result)
-                result = functional_shapes_to_odes(neuron, solver_result)
-
+                at_least_one_functional_shape = False
+                for shape in equations_block.get_shapes():
+                    if shape.getVariable().getDifferentialOrder() == 0:
+                        at_least_one_functional_shape = True
+                if at_least_one_functional_shape:
+                    functional_shapes_to_odes(result, solver_result)
             else:
                 result = neuron
+        else:
+            code, message = Messages.getNeuronSolvedByGSL(neuron.getName())
+            Logger.log_message(neuron, code, message, neuron.getSourcePosition(), LOGGING_LEVEL.INFO)
+            at_least_one_functional_shape = False
+            for shape in equations_block.get_shapes():
+                if shape.getVariable().getDifferentialOrder() == 0:
+                    at_least_one_functional_shape = True
+            if at_least_one_functional_shape:
+                ode_shapes = solve_functional_shapes(equations_block)
+                functional_shapes_to_odes(result, ode_shapes)
 
-            spike_updates = []
-            for declaration in initial_values.getDeclarations():
-                variable = declaration.getVariables()[0]
-                for shape in shape_to_buffers:
-                    matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                    if re.match(matcher_computed_shape_odes, str(variable)):
-                        assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
-                                            printer.printExpression(declaration.getExpression())
-                        spike_updates.append(ModelParser.parseAssignment(assignment_string))
-                        # the IV is applied. can be reseted
-                        declaration.set_expression(ModelParser.parse_expression("0"))
-                not_shape = True
-                for shape in shape_to_buffers:
-                    matcher_computed_shape_odes = re.compile(shape + r"__\d+")
-                    if re.match(matcher_computed_shape_odes, str(variable)):
-                        not_shape = True
-
-                if not_shape:
-                    result.addToStateBlock(declaration)
-
-            initial_values.getDeclarations().clear()
-
-            for assignment in spike_updates:
-                add_assignment_to_update_block(assignment, result)
-    print(result)
+        apply_spikes_from_buffers(result, shape_to_buffers)
     return result
+
+
+def apply_spikes_from_buffers(neuron, shape_to_buffers):
+    spike_updates = []
+    initial_values = neuron.get_initial_values_blocks()
+    for declaration in initial_values.getDeclarations():
+
+        variable = declaration.getVariables()[0]
+        for shape in shape_to_buffers:
+            matcher_computed_shape_odes = re.compile(shape + r"(__\d+)?")
+
+            if re.match(matcher_computed_shape_odes, str(variable)):
+                assignment_string = str(variable) + " += " + shape_to_buffers[shape] + " * " + \
+                                    _printer.printExpression(declaration.getExpression())
+                spike_updates.append(ModelParser.parseAssignment(assignment_string))
+                # the IV is applied. can be reseted
+                declaration.set_expression(ModelParser.parse_expression("0"))
+    for assignment in spike_updates:
+        add_assignment_to_update_block(assignment, neuron)
 
 
 def solve_ode_with_shapes(equations_block):
@@ -329,24 +341,25 @@ def transform_ode_and_shapes_to_json(equations_block):
     :param equations_block:equations_block
     :return: json mapping: {odes: [...], shape: [...]}
     """
-    printer = ExpressionsPrettyPrinter()
-
     result = {"odes": [], "shapes": []}
 
     for equation in equations_block.get_equations():
         result["odes"].append({"symbol": equation.getLhs().getName(),
-                               "definition": printer.printExpression(equation.get_rhs())})
+                               "definition": _printer.printExpression(equation.get_rhs())})
 
     ode_shape_names = set()
     for shape in equations_block.get_shapes():
         if shape.getVariable().getDifferentialOrder() == 0:
             result["shapes"].append({"type": "function",
                                      "symbol": shape.getVariable().getCompleteName(),
-                                     "definition": printer.printExpression(shape.getExpression())})
+                                     "definition": _printer.printExpression(shape.getExpression())})
 
         else:
-            if '__' not in shape.getVariable().getName():
-                ode_shape_names.add(shape.getVariable().getName())
+            extracted_shape_name = shape.getVariable().getName()
+            if '__' in shape.getVariable().getName():
+                extracted_shape_name = shape.getVariable().getName()[0:shape.getVariable().getName().find("__")]
+            if extracted_shape_name not in ode_shape_names:  # add shape name only once
+                ode_shape_names.add(extracted_shape_name)
 
     # try to resolve all available initial values
     shape_name_to_initial_values = {}
@@ -354,13 +367,14 @@ def transform_ode_and_shapes_to_json(equations_block):
 
     for shape_name in ode_shape_names:
         shape_name_symbol = equations_block.getScope().resolveToAllSymbols(shape_name, SymbolKind.VARIABLE)
-        shape_name_to_initial_values[shape_name] = [printer.printExpression(shape_name_symbol.getDeclaringExpression())]
+        shape_name_to_initial_values[shape_name] = [_printer.printExpression(shape_name_symbol.getDeclaringExpression())]
+        shape_name_to_shape_definition[shape_name] = _printer.printExpression(shape_name_symbol.getOdeDefinition())
         order = 1
         while True:
             shape_name_symbol = equations_block.getScope().resolveToAllSymbols(shape_name + "__" + 'd' * order, SymbolKind.VARIABLE)
             if shape_name_symbol is not None:
-                shape_name_to_initial_values[shape_name].append(printer.printExpression(shape_name_symbol.getDeclaringExpression()))
-                shape_name_to_shape_definition[shape_name] = printer.printExpression(shape_name_symbol.getOdeDefinition())
+                shape_name_to_initial_values[shape_name].append(_printer.printExpression(shape_name_symbol.getDeclaringExpression()))
+                shape_name_to_shape_definition[shape_name] = _printer.printExpression(shape_name_symbol.getOdeDefinition())
             else:
                 break
             order = order + 1
@@ -370,6 +384,32 @@ def transform_ode_and_shapes_to_json(equations_block):
                                      "symbol": shape_name,
                                      "definition": shape_name_to_shape_definition[shape_name],
                                      "initial_values": shape_name_to_initial_values[shape_name]})
+
+    result["parameters"] = []  # ode-framework requires this.
+    return result
+
+
+def solve_functional_shapes(equations_block):
+    # type: (ASTEquationsBlock) -> dict[str, list]
+    shapes_json = transform_functional_shapes_to_json(equations_block)
+
+    return analysis(shapes_json)
+
+
+def transform_functional_shapes_to_json(equations_block):
+    # type: (ASTEquationsBlock) -> dict[str, list]
+    """
+    Converts AST node to a JSON representation
+    :param equations_block:equations_block
+    :return: json mapping: {odes: [...], shape: [...]}
+    """
+    result = {"odes": [], "shapes": []}
+
+    for shape in equations_block.get_shapes():
+        if shape.getVariable().getDifferentialOrder() == 0:
+            result["shapes"].append({"type": "function",
+                                     "symbol": shape.getVariable().getCompleteName(),
+                                     "definition": _printer.printExpression(shape.getExpression())})
 
     result["parameters"] = []  # ode-framework requires this.
     return result
@@ -421,12 +461,11 @@ def transform_functions_json(equations_block):
     :param equations_block:equations_block
     :return: json mapping: {odes: [...], shape: [...]}
     """
-    printer = ExpressionsPrettyPrinter()
     equations_block = OdeTransformer.refactor_convolve_call(equations_block)
     result = []
 
     for fun in equations_block.get_functions():
         result.append({"symbol": fun.getVariableName(),
-                       "definition": printer.printExpression(fun.getExpression())})
+                       "definition": _printer.printExpression(fun.getExpression())})
 
     return result

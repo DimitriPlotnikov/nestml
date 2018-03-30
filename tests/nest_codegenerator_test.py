@@ -25,7 +25,7 @@ from pynestml.codegeneration.nest_codegeneration import generate_nest_module_cod
     analyse_and_generate_neurons
 from pynestml.frontend.FrontendConfiguration import FrontendConfiguration
 from pynestml.modelprocessor.ModelParser import ModelParser
-from tests.nestml_models_paths import iaf_psc_alpha_path
+from tests.nestml_models_paths import iaf_psc_alpha_path, iaf_psc_delta_path
 
 
 class CodegeneratorTest(unittest.TestCase):
@@ -60,6 +60,27 @@ class CodegeneratorTest(unittest.TestCase):
     def test_iaf_psc_alpha(self):
         path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join(
             '..', 'models', 'iaf_psc_alpha.nestml'))))
+
+        params = list()
+        params.append('-path')
+        params.append(path)
+        # params.append('-dry')
+        params.append('-logging_level')
+        params.append('NO')
+        params.append('-target')
+        params.append('target')
+        params.append('-store_log')
+        params.append('-dev')
+
+        FrontendConfiguration.config(params)
+
+        compilation_unit = ModelParser.parse_file_and_build_symboltable(path)
+        generate_nest_module_code(compilation_unit.getNeuronList())
+        analyse_and_generate_neurons(compilation_unit.getNeuronList())
+
+    def test_iaf_psc_delta(self):
+        path = str(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.join(
+            '..', 'models', 'iaf_psc_delta.nestml'))))
 
         params = list()
         params.append('-path')

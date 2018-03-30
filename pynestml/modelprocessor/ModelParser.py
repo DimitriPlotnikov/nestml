@@ -69,6 +69,8 @@ class ModelParser(object):
         ast = astBuilderVisitor.visit(compilationUnit)
         # create and update the corresponding symbol tables
         SymbolTable.initialize_symbol_table(ast.getSourcePosition())
+
+        # TODO must be here. this adds additional ODEs for var'' = ...
         for neuron in ast.getNeuronList():
             ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(neuron)
             SymbolTable.add_neuron_scope(neuron.getName(), neuron.getScope())

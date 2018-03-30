@@ -157,7 +157,7 @@ def compute_state_shape_variables_updates(solver_output):
     return state_shape_updates
 
 
-def replace_integrate_call(neuron, solver_output):
+def replace_integrate_call(neuron, update_instructions):
     # type: (...) -> ASTNeuron
     """
     Replaces all integrate calls to the corresponding references to propagation.
@@ -179,7 +179,7 @@ def replace_integrate_call(neuron, solver_output):
         for i in range(0, len(block.getStmts())):
             if block.getStmts()[i].equals(small_statement):
                 del block.getStmts()[i]
-                block.getStmts()[i:i] = list((ASTCreator.createStatement(prop) for prop in solver_output["ode_updates"]))
+                block.getStmts()[i:i] = list((ASTCreator.createStatement(prop) for prop in update_instructions))
                 break
     else:
         code, message = Messages.getOdeSolutionNotUsed()

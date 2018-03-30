@@ -19,6 +19,10 @@
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
 import re
 
+from sympy import simplify, diff, Symbol, exp
+from sympy.parsing.sympy_parser import parse_expr
+
+from pynestml.modelprocessor import PredefinedFunctions
 from pynestml.modelprocessor.ASTNeuron import ASTNeuron
 from pynestml.modelprocessor.ASTOdeShape import ASTOdeShape
 from pynestml.modelprocessor.ModelParser import ModelParser
@@ -26,6 +30,61 @@ from pynestml.solver.TransformerBase import add_declarations_to_internals, \
     compute_state_shape_variables_declarations, add_declarations_to_initial_values, \
     compute_state_shape_variables_updates, replace_integrate_call, add_state_updates
 from pynestml.utils.ASTCreator import ASTCreator
+from pynestml.utils.ASTUtils import ASTUtils
+
+def integrate_delta_solution(equations_block, neuron, shape, shape_to_buffers):
+    def ode_is_lin_const_coeff(ode_symbol, ode_definition, shapes):
+        """
+        TODO: improve the original code: the function should take a list of shape names, not objects
+        :param ode_symbol string encoding the LHS
+        :param ode_definition string encoding RHS
+        :param shapes A list with shape names
+        :return true iff the ode definition is a linear and constant coefficient ODE
+        """
+
+        ode_symbol_sp = parse_expr(ode_symbol)
+        ode_definition_sp = parse_expr(ode_definition)
+
+        # Check linearity
+        ddvar = diff(diff(ode_definition_sp, ode_symbol_sp), ode_symbol_sp)
+
+        if simplify(ddvar) != 0:
+            return False
+
+        # Check coefficients
+        dvar = diff(ode_definition_sp, ode_symbol_sp)
+
+        for shape in shapes:
+            for symbol in dvar.free_symbols:
+                if shape == str(symbol):
+                    return False
+        return True
+
+    ode_lhs = str(equations_block.get_equations()[0].getLhs().getName())
+    ode_rhs = str(equations_block.get_equations()[0].get_rhs())
+    shape_name = shape.getVariable().getName()
+    if not (ode_is_lin_const_coeff(ode_lhs, ode_rhs, [shape_name])):
+        raise Exception("Cannot handle delta shape in a not linear constant coefficient ODE.")
+    ode_lhs = parse_expr(ode_lhs)
+    ode_rhs = parse_expr(ode_rhs)
+    # constant input
+    const_input = simplify(1 / diff(ode_rhs, parse_expr(shape_name)) *
+                           (ode_rhs - diff(ode_rhs, ode_lhs) * ode_lhs) - (parse_expr(shape_name)))
+    # ode var factor
+    c1 = diff(ode_rhs, ode_lhs)
+    # The symbol must be declared again. Otherwise, the right hand side will be used for the derivative
+    c2 = diff(ode_rhs, parse_expr(shape_name))
+    # tau is passed as the second argument of the 'delta' function
+    tau_constant = parse_expr(str(shape.getExpression().getFunctionCall().getArgs()[1]))
+    ode_var_factor = exp(-Symbol('__h') / tau_constant)
+    ode_var_update_instructions = [
+        str(ode_lhs) + " = " + str(ode_var_factor * ode_lhs),
+        str(ode_lhs) + " += " + str(simplify(c2 / c1 * (exp(Symbol('__h') * c1) - 1)) * const_input)]
+    for k in shape_to_buffers:
+        ode_var_update_instructions.append(str(ode_lhs) + " += " + shape_to_buffers[k])
+    neuron.addToInternalBlock(ASTCreator.createDeclaration('__h ms = resolution()'))
+    replace_integrate_call(neuron, ode_var_update_instructions)
+    return neuron
 
 
 def integrate_exact_solution(neuron, exact_solution):
@@ -46,7 +105,7 @@ def integrate_exact_solution(neuron, exact_solution):
     state_shape_variables_updates = compute_state_shape_variables_updates(exact_solution)
     neuron = add_state_updates(state_shape_variables_updates, neuron)
 
-    neuron = replace_integrate_call(neuron, exact_solution)
+    neuron = replace_integrate_call(neuron, exact_solution["ode_updates"])
 
     return neuron
 

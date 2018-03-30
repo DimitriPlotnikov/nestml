@@ -21,7 +21,7 @@
 import os
 import sys
 
-from pynestml.codegeneration.nest_codegeneration import NestCodeGenerator
+from pynestml.codegeneration.nest_codegeneration import generate_nest_module_code, analyse_and_generate_neurons
 from pynestml.frontend.FrontendConfiguration import FrontendConfiguration
 from pynestml.modelprocessor.CoCosManager import CoCosManager
 from pynestml.modelprocessor.ModelParser import ModelParser
@@ -37,15 +37,16 @@ def main(args):
     except InvalidPathException:
         print('Not a valid path to model or directory: "%s"!' % FrontendConfiguration.getPath())
         return
-
     # now proceed to parse all models
     compilationUnits = list()
     for file in FrontendConfiguration.getFiles():
+        print("Parses and builds symbol table for the file: ", file)
         parsedUnit = ModelParser.parse_file_and_build_symboltable(file)
         if parsedUnit is not None:
             compilationUnits.append(parsedUnit)
     # generate a list of all neurons
     neurons = list()
+
     for compilationUnit in compilationUnits:
         neurons.extend(compilationUnit.getNeuronList())
     # check if across two files two neurons with same name have been defined
@@ -60,9 +61,8 @@ def main(args):
                 neurons.remove(neuron)
 
     if not FrontendConfiguration.isDryRun():
-        nestGenerator = NestCodeGenerator()
-        nestGenerator.analyse_and_generate_neurons(neurons)
-        nestGenerator.generate_nest_module_code(neurons)
+        analyse_and_generate_neurons(neurons)
+        generate_nest_module_code(neurons)
     else:
         code, message = Messages.getDryRun()
         Logger.log_message(neuron=None, code=code, message=message, log_level=LOGGING_LEVEL.INFO)

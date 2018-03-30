@@ -773,12 +773,12 @@ class Messages(object):
         return MessageCode.SYMBOL_NOT_RESOLVED, message
 
     @classmethod
-    def getNeuronSolvedBySolver(cls, _name):
+    def getNeuronSolvedByGSL(cls, _name):
         """
         Indicates that a neuron will be solved by the GSL solver inside the model printing process without any
         modifications to the initial model.
         :param _name: the name of the neuron
-        :type _name: str
+        :type _name: strprint
         :return: a message
         :rtype: (MessageCode,str)
         """

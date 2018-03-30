@@ -57,8 +57,6 @@ class ASTSymbolTableVisitor(NESTMLVisitor):
                            message=message, log_level=LOGGING_LEVEL.INFO)
         ASTSymbolTableVisitor.visitNeuron(_astNeuron)
         Logger.setCurrentNeuron(None)
-        print("run for " + _astNeuron.getName())
-        return
 
     @classmethod
     def visitNeuron(cls, _neuron=None):

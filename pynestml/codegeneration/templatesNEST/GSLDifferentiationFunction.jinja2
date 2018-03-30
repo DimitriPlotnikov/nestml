@@ -28,7 +28,7 @@ extern "C" inline int {{neuronName}}_dynamics(double, const double ode_state[], 
 
   {%- for odeVariable in neuron.getNonFunctionInitialValuesSymbols() -%}
   {%- if odeVariable.isOdeDefined() %}
-  f[{{names.arrayIndex(odeVariable)}}] = {{printerGSL.printExpression(ode)}};
+  f[{{names.arrayIndex(odeVariable)}}] = {{printerGSL.printExpression(odeVariable.getOdeDefinition())}};
   {%- endif -%}
   {%- endfor %}
   return GSL_SUCCESS;

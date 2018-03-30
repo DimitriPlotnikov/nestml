@@ -375,7 +375,6 @@ private:
     double __integration_step; //!< current integration time step, updated by GSL
     {% endif -%}
   };
-
   {%- for state in neuron.getStateSymbols() -%}
   {%- with variable = state -%}
   {%- include "MemberVariableGetterSetter.jinja2" -%}
@@ -383,9 +382,11 @@ private:
   {%- endfor -%}
 
   {%- for init in neuron.getInitialValuesSymbols() -%}
+  // start handling the variable
   {%- with variable = init -%}
   {%- include "MemberVariableGetterSetter.jinja2" -%}
   {%- endwith -%}
+  // end handling the variable
   {%- endfor -%}
 
   {%- for parameter in neuron.getParameterSymbols() -%}

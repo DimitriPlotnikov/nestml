@@ -2,12 +2,12 @@ import json
 from unittest import TestCase
 
 from pynestml.codegeneration.nest_codegeneration import solve_ode_with_shapes, make_functions_self_contained, \
-    replace_functions_through_defining_expressions
+    replace_functions_through_defining_expressions, solve_functional_shapes
 from pynestml.modelprocessor import ASTSymbolTableVisitor
 from pynestml.modelprocessor.ModelParser import ModelParser
 from pynestml.solver.solution_transformers import integrate_exact_solution, functional_shapes_to_odes
 from pynestml.utils.OdeTransformer import OdeTransformer
-from tests.nestml_models_paths import iaf_psc_alpha_path, iaf_cond_alpha_path
+from tests.nestml_models_paths import iaf_cond_alpha_path, iaf_psc_alpha_path
 
 
 class SolutionTransformerTest(TestCase):
@@ -52,9 +52,11 @@ class SolutionTransformerTest(TestCase):
             ast_neuron.get_equations_block().get_functions())
 
         equations_block = ast_neuron.get_equations_block()
-        exact_solution = solve_ode_with_shapes(equations_block)
+        exact_solution = solve_functional_shapes(equations_block)
         self.assertTrue(exact_solution["solver"] is "numeric")
-        functional_shapes_to_odes(ast_neuron, exact_solution)
+
+        ode_shapes = solve_functional_shapes(equations_block)
+        functional_shapes_to_odes(ast_neuron, ode_shapes)
         ASTSymbolTableVisitor.ASTSymbolTableVisitor.updateSymbolTable(ast_neuron)
 
         for shape in ast_neuron.get_equations_block().get_shapes():
